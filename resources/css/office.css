@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+body{
+  background-image: url("/public/images/bg.jpg")!important;
+  background-size: cover;
+}
+
+h3{
+  color: #131313!important;
+  font-family: "Raleway", sans-serif;
+  font-weight: 800!important;
+  font-style: normal!important;
+  text-transform: uppercase;
+}
+
+
+.floating-btn{
+  width: 50px;
+  height: 50px;
+  background: #470303;
+  display: flex;
+  justify-content: center;
+  color: white;
+  position: fixed;
+  right: 50px;
+  bottom: 35px;
+  border-radius: 50%;
+}
+.floating-btn:hover{
+  background: rgb(210, 210, 210);
+  cursor: pointer;
+  color:  #470303;
+  border: 1px solid  #470303;
+ 
+}
+.bx-plus{
+  font-size: 30px;
+  margin-top: 20%;
+}
+
+#btn-add{
+background-color: #07334f;
+}
+
+select{
+width: 60px !important;
+}
+.container.bg-light.rounded  {
+  box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.5);
+}
+
+.btn-outline-primary{
+  background: linear-gradient(to left, #760000, #760000);
+  border-color: #0a5c81;
+  color: #f8f9fa!important;
+  border: none!important;
+  border-radius: 15px!important;
+  padding: 6px!important;
+  padding-left: 10px!important;
+  padding-right: 10px!important;
+  transition: 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  background: linear-gradient(to left, #760000, #470303);
+  color: #f8f9fa!important;
+  border: none!important;
+  padding: 6px!important;
+  padding-left: 10px!important;
+  padding-right: 10px!important;
+}
+
+.paginate_button.current{
+  background: linear-gradient(to bottom, #ccd4dd, #cccccc)!important;
+  color: #f8f9fa !important;
+  border: none!important;
+  border-radius: 5px!important;
+
+}
+
+
+.paginate_button:hover{
+  background: linear-gradient(to top, #cccccc, #cccccc)!important;
+  color: #f8f9fa !important;
+  border: none!important;
+  border-radius: 5px!important;
+
+}
+
+.btn-primary{
+  background: linear-gradient(to left, #760000, #760000);
+  border-color: #760000;
+  color: #f8f9fa!important;
+
+}
+
+.btn-primary:hover {
+  background: linear-gradient(to left, #470303, #470303);
+  color: #f8f9fa!important;
+  border-color: #470303;
+}

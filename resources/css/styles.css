@@ -1,0 +1,249 @@
+/* styles.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #290f0f;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.login-modal {
+    background-color: #f8f8f0;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 20;
+    max-width: 400px;
+    width: 80%;
+}
+
+.modal-logo {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.login-text h2 {
+    margin: 20px 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.login-text .agreement {
+    text-decoration: none;
+    color: #800000;
+}
+
+.accept-button {
+    background-color: #800000;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.accept-button:hover {
+    background-color: #660000;
+}
+
+.content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100%;
+}
+
+.login-container {
+    background-color: #130000;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+.logo img {
+    display: block;
+    margin: 0 auto 20px;
+    padding-bottom: 10px;
+    width: 175px;
+    height: 175px;
+}
+
+.logo-text {
+    margin-top: -45px;
+    margin-bottom: 10px;
+    text-align: center;
+    justify-content: center;
+}
+
+.logo-text h3 {
+    font-size: 48px;
+    font-family: "Cinzel Decorative";
+    color: #fff;
+    margin-bottom: -1px;
+}
+
+.logo-text span {
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+label {
+    color: #fff;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #fff;
+    padding-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.password-group {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 72.5%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.remember-me input {
+    margin-right: 5px;
+}
+
+.forgot-password {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.forgot-password a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+
+.login-button {
+    background-color: #800000;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: 0.3s ease;
+}
+
+.login-button:hover {
+    background-color: #660000;
+}
+
+.blur {
+    filter: blur(5px);
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+        /* Error Styling */
+        .error-input {
+            border-color: #e3342f;
+            background-color: #fce4e4;
+        }
+        .error-message {
+            color: #e3342f;
+            font-size: 0.9em;
+            margin-top: 0.25em;
+        }
+
+        /* Loader Styles */
+        .loader-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .loader-text {
+            margin-top: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 30px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .loader {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #db3434; /* Blue */
+            border-radius: 50%;
+            width: 160px;
+            height: 160px;
+            animation: spin 1s  infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }

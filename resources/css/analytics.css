@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f4f7;
+    margin: 0;
+    padding: 0;
+}
+
+.container-fluid {
+    padding: 20px;
+}
+
+.container.bg-light.rounded  {
+    box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.5);
+  }
+h3{
+    color: #131313!important;
+    font-family: "Raleway", sans-serif;
+    font-weight: 800!important;
+    font-style: normal!important;
+    text-transform: uppercase;
+  }
+h2 {
+    font-size: 24px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-family: "Raleway", sans-serif;
+}
+
+/* Card Styles */
+.card {
+    border: none;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.card-title {
+    font-size: 16px;
+    color: #7f8c8d;
+}
+
+.card-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: #34495e;
+}
+
+/* Chart Container Styles */
+.chart-container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Table Styles */
+.table-responsive {
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th, .table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 8px;
+    font-size: 14px;
+}
+
+.table thead th {
+    background-color: #2c3e50;
+    color: #ffffff;
+}
+
+.table tbody tr:hover {
+    background-color: #ecf0f1;
+}
+
+#downloadPdf {
+  border-radius: 20px;
+  display: flex;
+  margin-left: 10px;
+  margin-right: 20px;
+  background: #0a5c81;
+  border-color: #0a5c81;
+  transition: 0.3s ease;
+}
+
+#downloadPdf:hover{
+  background-color: #042940
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .chart-container {
+        padding: 10px;
+    }
+
+    .card-text {
+        font-size: 18px;
+    }
+
+    .table-responsive {
+        padding: 10px;
+    }
+
+    .table th, .table td {
+        font-size: 12px;
+        padding: 6px;
+    }
+}

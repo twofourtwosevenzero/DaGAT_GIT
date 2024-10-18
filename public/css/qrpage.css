@@ -1,0 +1,209 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+body {
+  background-image: url("../assets/bg.jpg");
+  background-size: cover;
+}
+
+/* General Styling */
+h1 {
+  color: #131313 !important;
+  font-family: "Raleway", sans-serif;
+  font-weight: 800 !important;
+  font-style: normal !important;
+  text-transform: uppercase;
+}
+
+p {
+  color: #042940 !important;
+  font-family: "Lora", sans-serif !important;
+  font-weight: 700 !important;
+  font-style: normal !important;
+  white-space: nowrap;
+}
+
+.floating-btn {
+  width: 50px;
+  height: 50px;
+  background: #011826;
+  display: flex;
+  justify-content: center;
+  color: white;
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.floating-btn:hover {
+  background: rgb(189, 218, 255);
+  cursor: pointer;
+  color: #011826;
+  border: 1px solid #011826;
+}
+
+.bx-plus {
+  font-size: 30px;
+  margin-top: 20%;
+}
+
+select {
+  width: 50px !important;
+}
+
+#confirmModal {
+  padding-top: 10%;
+}
+
+#background {
+  width: 50%;
+  margin-left: 100px;
+}
+
+#done {
+  border-color: #800008;
+  background-color: #800000;
+  transition: 0.3s ease-in;
+}
+
+#done:hover {
+  background-color: #3a0000;
+}
+
+.pin-input-section {
+  font-weight: bold;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 10px;
+  top: 20%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+/* Error Icon */
+.error i {
+  font-size: 25px;
+  text-decoration: none;
+  color: #800000;
+  margin-left: 600px;
+  margin-top: -515px;
+  transition: 0.3s ease;
+}
+
+.error i:hover {
+  color: #3a0000;
+}
+
+/* Responsive Design for Various Screen Sizes */
+
+/* Large screens (1536px and above) */
+@media (max-width: 1536px) {
+  .file-name {
+    font-size: 1.2rem;
+  }
+  .btn {
+    font-size: 1rem;
+  }
+  #background {
+    width: 50%;
+    margin: auto;
+  }
+}
+
+/* Tablets and small laptops (768px - 1536px) */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+  p {
+    font-size: 1rem;
+  }
+  .dts {
+    font-size: 10px;
+    font-family: "Raleway", sans-serif;
+  }
+  #background {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .error i {
+    font-size: 22px;
+    margin-top: -20px;
+    margin-left: auto;
+    display: block; /* Center the error icon */
+  }
+}
+
+/* Smartphones (576px - 768px) */
+@media (max-width: 576px) {
+  #background {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #white {
+    padding: 15px; /* Reduce padding for small screens */
+  }
+
+  h1 {
+    font-size: 1.25rem; /* Reduce heading size */
+  }
+
+  p {
+    font-size: 1rem; /* Adjust paragraph font size */
+  }
+
+  .file-name {
+    font-size: 1rem; /* Reduce document description size */
+  }
+
+  .eye-icon {
+    right: 5px; /* Adjust eye icon position */
+  }
+
+  .error i {
+    font-size: 20px; /* Adjust error icon size */
+    margin-top: -10px;
+  }
+
+  .btn {
+    font-size: 0.875rem; /* Reduce button text size */
+  }
+}
+
+/* Very small smartphones (425px and below) */
+@media (max-width: 425px) {
+  #white {
+    width: 100%;
+    padding: 10px;
+  }
+  h1 {
+    font-size: 1rem;
+  }
+  p {
+    font-size: 0.875rem;
+  }
+  .file-name {
+    font-size: 0.875rem;
+  }
+  .eye-icon {
+    top: 30%; /* Adjust eye icon position */
+  }
+  .error i {
+    font-size: 18px; /* Further reduce error icon size */
+  }
+  #background {
+    width: 100%;
+    margin-left: 0;
+  }
+}

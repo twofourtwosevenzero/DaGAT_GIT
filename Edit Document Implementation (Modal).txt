@@ -1,0 +1,173 @@
+app > Models > Documents > Document
+
+// Define the relationship with Signatory
+public function signatories()
+{
+return $this->hasMany(Signatory::class, 'QRC_ID', 'id');
+}
+
+/////////////////////////////////////  routes > web.php
+
+// Documents routes
+Route::put('/documents/{document}', [DocumentController::class, 'update'])->name('documents.update');
+
+////////////////////////// app > Http > Controllers > DocumentController.php
+
+public function update(Request $request, Document $document)
+
+{
+$validatedData = $request->validate([
+'description' => 'required|string|max:255',
+'document_type' => 'required|exists:document_types,id',
+'document_file' => 'file|mimes:pdf,doc,docx',
+'signatories' => 'required|array',
+'signatories.*' => 'exists:offices,id',
+]);
+
+$document->update([
+'Description' => $validatedData['description'],
+'DT_ID' => $validatedData['document_typ'],
+'Document_File' => $request->file('document_file') ? $request->file('document_file')->store('documents', 'public') :
+$document->Document_File,
+]);
+
+$document->signatories()->delete();
+
+foreach ($validatedData['signatories'] as $officeId) {
+Signatory::create([
+'QRC_ID' => $document->qrcode->id,
+'Office_ID' => $officeId,
+'Status_ID' => 1,
+]);
+}
+
+return redirect()->route('documents.index')->with('success', 'Document updated successfully.');
+}
+
+///////////////////////// resources > views > documents > index.blade.php
+
+<!-- Edit Button -->
+<td>
+    <button class="btn btn-outline-primary btn-sm" onclick="openModal(this)" data-id="{{ $document->id }}"
+        data-description="{{ $document->Description }}" data-document-type="{{ $document->DT_ID }}"
+        data-signatories="{{ json_encode($document->signatories->pluck('Office_ID')->toArray() ?? []) }}">
+        <i class='bx bx-edit'></i>
+    </button>
+    <form action="" method="POST" style="display: inline;">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-outline-dark btn-sm"><i class='bx bx-trash'></i></button>
+    </form>
+</td>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal fade" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Edit Modal Body-->
+            <div class="modal-body">
+                <form id="edit-form" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT') <!-- or PATCH depending on your route configuration -->
+                    <div class="mb-1 form-group">
+                        <label for="description" class="form-label">Document Name</label>
+                        <input type="text" name="description" id="description" class="form-control" value=""
+                            required>
+                    </div>
+                    <div class="mb-1 form-group">
+                        <label for="document_type">Document Type</label>
+                        <select name="document_type" id="document_type" class="form-control" required>
+                            @foreach ($documentTypes as $type)
+                                <option value="{{ $type->id }}">{{ $type->DT_Type }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-1 py-2 form-group">
+                        <label for="document_file">Document File</label>
+                        <input type="file" name="document_file" id="document_file" class="form-control">
+                    </div>
+                    <div class="mb-1 form-group">
+                        <label for="signatories">Signatories</label>
+                        <div id="signatories">
+                            @foreach ($offices as $office)
+                                <div class="form-check">
+                                    <input type="checkbox" name="signatories[]" value="{{ $office->id }}"
+                                        class="form-check-input" id="signatory{{ $office->id }}">
+                                    <label class="form-check-label"
+                                        for="signatory{{ $office->id }}">{{ $office->Office_Name }}</label>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" id="btn-add" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Edit Modal End -->
+
+
+<script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous">
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+            integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous">
+        </script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+        <script src="{{ asset('js/documents.js') }}"></script>
+
+///////////////////////////////////// public > js > documents.js
+
+function openModal(button) {
+    // Get data attributes from the button
+    const documentId = button.getAttribute("data-id");
+    const description = button.getAttribute("data-description");
+    const documentType = button.getAttribute("data-document-type");
+    const signatories = JSON.parse(button.getAttribute("data-signatories"));
+
+    // Find the modal element
+    const modal = document.getElementById("editModal");
+
+    // Set modal fields with the provided data
+    modal.querySelector("#description").value = description;
+    modal.querySelector("#document_type").value = documentType;
+
+    // Clear and set signatories checkboxes
+    const signatoriesDiv = modal.querySelector("#signatories");
+    signatoriesDiv.querySelectorAll(".form-check-input").forEach((checkbox) => {
+        checkbox.checked = signatories.includes(parseInt(checkbox.value, 10)); // Ensure value is an integer
+    });
+
+    // Set form action URL dynamically
+    const editForm = document.getElementById("edit-form");
+    editForm.action = `/documents/${documentId}`;
+
+    // Initialize and show the Bootstrap modal
+    const bootstrapModal = new bootstrap.Modal(modal);
+    bootstrapModal.show();
+}
+
+///////////////////////////////////// resources > css > document.css
+
+/* Modal styles */
+#editModal {
+  display: none;
+  position: fixed;
+  z-index: 1500;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}

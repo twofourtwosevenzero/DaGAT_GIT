@@ -1,0 +1,87 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+body{
+  background-image: url("/public/images/bg.jpg");
+  background-size: cover;
+}
+h3{
+  color: #131313!important;
+  font-family: "Raleway", sans-serif;
+  font-weight: 800!important;
+  font-style: normal!important;
+  text-transform: uppercase;
+}
+
+
+.floating-btn{
+  width: 50px;
+  height: 50px;
+  background: #011826;
+  display: flex;
+  justify-content: center;
+  color: white;
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  border-radius: 50%;
+  z-index: 1;
+  transition: 0.25s ease;
+}
+.floating-btn:hover{
+  background: rgb(189, 218, 255);
+  cursor: pointer;
+  color:  #011826;
+  border: 1px solid  #011826;
+ 
+}
+.bx-plus{
+  font-size: 30px;
+  margin-top: 20%;
+}
+
+select{
+  width: 60px !important;
+  }
+
+  .container {
+    box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.5);
+  }
+
+  .btn-outline-primary{
+    background: linear-gradient(to left, #760000, #760000);
+    border-color: #0a5c81;
+    color: #f8f9fa!important;
+    border: none!important;
+    border-radius: 15px!important;
+    padding: 6px!important;
+    padding-left: 10px!important;
+    padding-right: 10px!important;
+    transition: 0.3s ease;
+  }
+  
+  .btn-outline-primary:hover {
+    background: linear-gradient(to left, #760000, #470303);
+    color: #f8f9fa!important;
+    border: none!important;
+    padding: 6px!important;
+    padding-left: 10px!important;
+    padding-right: 10px!important;
+  }
+
+  .paginate_button.current{
+    background: linear-gradient(to bottom, #ccd4dd, #cccccc)!important;
+    color: #f8f9fa !important;
+    border: none!important;
+    border-radius: 5px!important;
+  
+  }
+  
+  
+  .paginate_button:hover{
+    background: linear-gradient(to top, #cccccc, #cccccc)!important;
+    color: #f8f9fa !important;
+    border: none!important;
+    border-radius: 5px!important;
+  
+  }
