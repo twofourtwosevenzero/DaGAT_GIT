@@ -11,6 +11,7 @@ use App\Models\QuickResponseCode;
 use App\Models\Signatory;
 use App\Models\ActivityLog;
 use App\Models\Status;
+use App\Models\RevisionRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -83,7 +84,7 @@ public function index(Request $request)
         ]);
     
         // Generate the QR code for the document
-        $localIP = env('APP_URL', 'http://192.168.254.107:8000'); // Use your local IP
+        $localIP = env('APP_URL', 'http://192.168.254.162:8000'); // Use your local IP
         $qrCodeUrl = $localIP . '/qrcode/scan/' . $document->id;
         $qrCode = QrCode::format('svg')->size(200)->generate($qrCodeUrl);
         $qrCodePath = 'qrcodes/' . $document->id . '.svg';
@@ -172,6 +173,9 @@ public function index(Request $request)
             Log::error('Invalid Office PIN:', ['office_pin' => $request->office_pin]);
             return redirect()->back()->withErrors(['office_pin' => 'Invalid Office PIN']);
         }
+
+            // Store the Office ID in the session
+        session(['current_office_id' => $office->id]);
 
         $qrcode = QuickResponseCode::findOrFail($id);
         $signatory = Signatory::where('QRC_ID', $qrcode->id)->where('Office_ID', $office->id)->first();
@@ -325,37 +329,73 @@ public function index(Request $request)
         Mail::to($recipientEmails)->send(new DocumentApproved($document, $lastApprovedOffice));
     }
     
-    public function requestRevision(Request $request, $documentId)
+    // Show the revision request form
+    public function showRevisionRequestForm($documentId)
+    {
+        $document = Document::findOrFail($documentId);
+        return view('documents.revision-request', compact('document'));
+    }
+    
+    // Process the revision request form submission
+    public function submitRevisionRequest(Request $request, $documentId)
     {
         $document = Document::findOrFail($documentId);
     
-        // Validate the input
-        $request->validate([
+        $validatedData = $request->validate([
             'revision_reason' => 'required|string|max:255',
             'revision_type' => 'required|in:Full Revision,Grammar Revision,Content Update,Formatting Issue,Data Accuracy,Compliance Issue,Missing Information,Legal Compliance,Other',
+            'office_pin' => 'required|string',
         ]);
     
-        // Save the revision request to the database
+        $office = Office::where('Office_Pin', $validatedData['office_pin'])->first();
+    
+        if (!$office) {
+            return redirect()->back()->withErrors(['office_pin' => 'Invalid Office PIN'])->withInput();
+        }
+    
+        // Create the revision request
         RevisionRequest::create([
             'document_id' => $document->id,
-            'signatory_id' => null, // or the appropriate Signatory ID if applicable
-            'revision_type' => $request->input('revision_type'),
-            'revision_reason' => $request->input('revision_reason'),
-            'requested_by' => Auth::id(),
+            'signatory_id' => null,
+            'revision_type' => $validatedData['revision_type'],
+            'revision_reason' => $validatedData['revision_reason'],
+            'requested_by' => $office->id,
         ]);
     
         // Log the revision request in the activity logs
         ActivityLog::create([
             'Docu_ID' => $document->id,
-            'Sign_ID' => null, // or the appropriate Signatory ID if applicable
+            'Sign_ID' => null,
             'action' => 'Revision Requested',
             'Timestamp' => now(),
-            'reason' => $request->input('revision_reason'),
+            'reason' => $validatedData['revision_reason'],
+            'requested_by' => $office->id, // This should now store the requesting office's ID
         ]);
     
-        return redirect()->back()->with('success', 'Revision request submitted successfully.');
+        return redirect()->route('documents.show', $documentId)->with('success', 'Revision request submitted successfully.');
     }
     
+    
+    
+    public function getRecentActivity()
+{
+    $recentLogs = ActivityLog::with('document', 'signatory.office')
+        ->orderBy('Timestamp', 'desc')
+        ->take(5) // limit to the most recent 5 activities, adjust as needed
+        ->get();
 
+    return response()->json($recentLogs);
+}
 
+public function getSignatories($id)
+{
+    $document = Document::with('qrcode.signatories.office')
+        ->where('id', $id)
+        ->firstOrFail();
+
+    // Return the signatories and their statuses as JSON
+    return response()->json($document->qrcode->signatories);
+}
+
+    
 }

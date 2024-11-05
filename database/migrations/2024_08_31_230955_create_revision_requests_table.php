@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('document_id')->constrained('documents')->onDelete('cascade');
             $table->foreignId('signatory_id')->nullable()->constrained('signatories')->onDelete('set null');
-            $table->foreignId('requested_by')->constrained('users')->onDelete('cascade');
+            $table->foreignId('requested_by')->constrained('offices')->onDelete('cascade');
             $table->string('revision_type');
             $table->string('revision_reason')->nullable();
             $table->enum('status', ['Pending', 'Completed'])->default('Pending');

@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\OfficeAnalyticsController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\DocumentTypeController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\AnalyticsController;
@@ -92,12 +93,8 @@ Route::middleware('auth')->group(function () {
 
 // Document routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/documents', [DocumentController::class, 'index'])->name('documents.index');
-    Route::get('/documents/create', [DocumentController::class, 'create'])->name('documents.create');
-    Route::post('/documents', [DocumentController::class, 'store'])->name('documents.store');
-    Route::get('/documents/{document}', [DocumentController::class, 'show'])->name('documents.show');
-    Route::put('/documents/{document}', [DocumentController::class, 'update'])->name('documents.update');
-    Route::resource('documents', DocumentController::class);
+  Route::resource('documents', DocumentController::class);
+    
 });
 
 // Analytics routes
@@ -116,9 +113,22 @@ Route::post('/documents/{document}/request-revision', [DocumentController::class
 
 Route::get('/document-types/{id}/signatories', [DocumentTypeController::class, 'getSignatories']);
 
+// Route to fetch recent activity data
+Route::get('/recent-activity', [DocumentController::class, 'getRecentActivity'])->name('recent-activity');
+
+Route::get('/documents/{id}/signatories', [DocumentController::class, 'getSignatories'])->name('documents.get-signatories');
+
+// Route for displaying the revision request page
+Route::get('/documents/{document}/revision-request', [DocumentController::class, 'showRevisionRequestForm'])->name('documents.show-revision-request');
+
+// Route for submitting the revision request
+Route::post('/documents/{document}/submit-revision-request', [DocumentController::class, 'submitRevisionRequest'])->name('documents.submit-revision-request');
+
+
+
+
 
 // Include Laravel's default authentication routes
 require __DIR__.'/auth.php';
 
-// Default home route after successful login
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+

@@ -9,8 +9,8 @@ class ActivityLogController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ActivityLog::with(['document', 'signatory.office'])->orderBy('Timestamp', 'asc');
-        
+        $query = ActivityLog::with(['document', 'signatory.office', 'requestedOffice'])->orderBy('Timestamp', 'desc');
+                
         if ($request->has('description') && $request->description != '') {
             $query->whereHas('document', function($q) use ($request) {
                 $q->where('Description', 'like', '%' . $request->description . '%');
@@ -46,12 +46,15 @@ class ActivityLogController extends Controller
     {
         $validatedData = $request->validate([
             'Docu_ID' => 'required',
-            'Sign_ID' => 'required',
+            'Sign_ID' => 'nullable',
             'Timestamp' => 'required|date',
+            'action' => 'required|string',
+            'reason' => 'nullable|string',
+            'requested_by' => 'nullable|exists:offices,id',
         ]);
-
+    
         ActivityLog::create($validatedData);
-
+    
         return redirect()->route('activitylogs.index')->with('success', 'Activity log created successfully.');
     }
 
@@ -69,12 +72,15 @@ class ActivityLogController extends Controller
     {
         $validatedData = $request->validate([
             'Docu_ID' => 'required',
-            'Sign_ID' => 'required',
+            'Sign_ID' => 'nullable',
             'Timestamp' => 'required|date',
+            'action' => 'required|string',
+            'reason' => 'nullable|string',
+            'requested_by' => 'nullable|exists:offices,id',
         ]);
-
+    
         $activityLog->update($validatedData);
-
+    
         return redirect()->route('activitylogs.index')->with('success', 'Activity log updated successfully.');
     }
 

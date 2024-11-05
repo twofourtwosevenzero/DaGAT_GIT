@@ -93,4 +93,49 @@
         <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
         <script src="{{ asset('js/documents.js') }}"></script>
         <script src="{{ asset('js/sidebar.js') }}"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                function fetchSignatories() {
+                    fetch("{{ route('documents.get-signatories', $document->id) }}")
+                        .then(response => response.json())
+                        .then(data => {
+                            let signatoriesContainer = document.querySelector(".list-group");
+                            signatoriesContainer.innerHTML = ""; // Clear current signatories
+            
+                            data.forEach(signatory => {
+                                // Create a list item for each signatory
+                                let listItem = document.createElement("div");
+                                listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+            
+                                let officeName = document.createElement("span");
+                                officeName.textContent = signatory.office.Office_Name;
+            
+                                let statusBadge = document.createElement("span");
+                                statusBadge.classList.add("badge");
+            
+                                // Assign badge class based on Status_ID and set text content accordingly
+                                if (signatory.Status_ID == 1) {
+                                    statusBadge.classList.add("bg-secondary");
+                                    statusBadge.textContent = "Pending";
+                                } else if (signatory.Status_ID == 2) {
+                                    statusBadge.classList.add("bg-warning");
+                                    statusBadge.textContent = `Received on ${signatory.Received_Date}`;
+                                } else if (signatory.Status_ID == 3) {
+                                    statusBadge.classList.add("bg-success");
+                                    statusBadge.textContent = `Approved on ${signatory.Signed_Date}`;
+                                }
+            
+                                listItem.appendChild(officeName);
+                                listItem.appendChild(statusBadge);
+                                signatoriesContainer.appendChild(listItem);
+                            });
+                        })
+                        .catch(error => console.error('Error fetching signatories:', error));
+                }
+            
+                // Poll for updates every 10 seconds
+                setInterval(fetchSignatories, 10000);
+            });
+            </script>
+            
 @endsection

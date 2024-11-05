@@ -16,6 +16,7 @@ class CreateActivityLogsTable extends Migration
             $table->timestamp('Timestamp');
             $table->string('reason')->nullable();  // Added for logging reasons for specific actions
             $table->timestamps();
+            $table->foreignId('requested_by')->nullable()->constrained('offices')->onDelete('set null');
         });
     }
     

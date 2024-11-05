@@ -74,38 +74,54 @@
         </div>
       </div>
 
-      <!-- Second Grid Item: Recent Activity -->
-      <div class="col-lg-6">
-        <div class="card mb-4 h-100">
-          <div class="card-header">
-            <h4 class="mb-0">Recent Activity</h4>
-          </div>
-          <div class="card-body recent-logs-container">
-            @forelse($recentLogs as $log)
-              <div class="recent-log-item">
-                <div class="icon-container">
-                  <i class='bx bx-file'></i>
-                </div>
-                <div class="log-content">
-                  @if($log->action == 'Deleted')
-                  <span class="log-description">
-                    <strong>{{ $log->document->Description ?? 'N/A' }}</strong> was deleted by {{ Auth::user()->name }} because {{ $log->reason ?? 'no reason provided' }}.
-                  </span>
-                  @else
-                  <span class="log-description">
-                    <strong>{{ $log->document->Description ?? 'N/A' }}</strong> {{ $log->action }} by {{ $log->signatory->office->Office_Name ?? 'N/A' }}.
-                  </span>
-                  @endif
-                  <br>
-                  <span class="log-timestamp">{{ $log->Timestamp->diffForHumans() }}</span>
-                </div>
-              </div>
-            @empty
-              <p class="text-center">No recent activity.</p>
-            @endforelse
-          </div>
-        </div>
+<!-- Second Grid Item: Recent Activity -->
+<div class="col-lg-6">
+  <div class="card mb-4 h-100">
+      <div class="card-header">
+          <h4 class="mb-0">Recent Activity</h4>
       </div>
+      <div class="card-body recent-logs-container">
+          @forelse($recentLogs as $log)
+              <div class="recent-log-item">
+                  <div class="icon-container">
+                      <i class='bx bx-file'></i>
+                  </div>
+                  <div class="log-content">
+                      @if($log->action == 'Deleted')
+                          <span class="log-description">
+                              <strong>{{ $log->document->Description ?? 'N/A' }}</strong> was deleted by 
+                              {{ $log->user->name ?? 'Unknown User' }} because {{ $log->reason ?? 'no reason provided' }}.
+                          </span>
+                      @elseif($log->action == 'Revision Requested')
+                          <span class="log-description">
+                              <strong>{{ $log->document->Description ?? 'N/A' }}</strong> Revision Requested by 
+                              {{ $log->requestedOffice->Office_Name ?? 'N/A' }}.
+                          </span>
+                      @elseif($log->action == 'Fully Approved')
+                          <span class="log-description">
+                              <strong>{{ $log->document->Description ?? 'N/A' }}</strong> Fully Approved by all signatories.
+                          </span>
+                      @elseif($log->signatory && $log->signatory->office)
+                          <span class="log-description">
+                              <strong>{{ $log->document->Description ?? 'N/A' }}</strong> {{ $log->action }} by 
+                              {{ $log->signatory->office->Office_Name ?? 'N/A' }}.
+                          </span>
+                      @else
+                          <span class="log-description">
+                              <strong>{{ $log->document->Description ?? 'N/A' }}</strong> {{ $log->action }}.
+                          </span>
+                      @endif
+                      <br>
+                      <span class="log-timestamp">{{ optional($log->Timestamp)->diffForHumans() ?? 'N/A' }}</span>
+                  </div>
+              </div>
+          @empty
+              <p class="text-center">No recent activity.</p>
+          @endforelse
+      </div>
+  </div>
+</div>
+
 
       <!-- Third Grid Item: Documents Processed Over Time Chart -->
       <div class="col-lg-6">

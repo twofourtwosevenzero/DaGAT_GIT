@@ -16,7 +16,8 @@ class ActivityLog extends Model
         'Sign_ID',
         'action',
         'Timestamp',
-        'reason', // Add this line
+        'reason',
+        'requested_by' // Add this to allow mass assignment
     ];
 
     public function document(): BelongsTo
@@ -28,4 +29,11 @@ class ActivityLog extends Model
     {
         return $this->belongsTo(Signatory::class, 'Sign_ID');
     }
+    // New relationship to fetch the office that requested the revision
+    public function requestedOffice(): BelongsTo
+    {
+        return $this->belongsTo(Office::class, 'requested_by');
+    }
+    
+    
 }

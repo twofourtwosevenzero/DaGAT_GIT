@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\DocumentType;
 use Illuminate\Http\Request;
@@ -55,7 +56,8 @@ class DocumentTypeController extends Controller
 
         return redirect()->route('document-types.index')->with('success', 'Document Type deleted successfully.');
     }
-
+  
+    
     //NEW HERE
     public function getSignatories($documentTypeId)
     {
@@ -68,6 +70,7 @@ class DocumentTypeController extends Controller
         return response()->json($signatories);
     }
 
+    
 
 
 }

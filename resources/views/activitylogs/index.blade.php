@@ -33,29 +33,31 @@
       @php
         $logs = $activityLogs->sortByDesc('Timestamp');
       @endphp
-    
       @foreach($logs as $log)
-        <div class="activity-log" data-timestamp="{{ \Carbon\Carbon::parse($log->Timestamp)->timestamp }}">
+      <div class="activity-log" data-timestamp="{{ optional($log->Timestamp)->timestamp }}">
           <div>
-            <div class="title">{{ $log->document->Description ?? 'N/A' }}</div>
-            <div class="description">
-              @if($log->action == 'Deleted')
-                {{ $log->document->Description }} was deleted by {{ Auth::user()->name }}.
-                <br><strong>Reason:</strong> {{ $log->reason ?? 'No reason provided' }}
-              @elseif($log->action == 'Fully Approved')
-                Fully Approved by all signatories.
-              @elseif($log->signatory && $log->signatory->office)
-                {{ $log->action }} by {{ $log->signatory->office->Office_Name ?? 'N/A' }}.
-              @else
-                {{ $log->action }}
-              @endif
-            </div>
+              <div class="title">{{ $log->document->Description ?? 'N/A' }}</div>
+              <div class="description">
+                  @if($log->action == 'Deleted')
+                      Deleted by {{ $log->user->name ?? 'Unknown User' }}.
+                      <br><strong>Reason:</strong> {{ $log->reason ?? 'No reason provided' }}
+                      @elseif($log->action == 'Revision Requested')
+                      Revision Requested by
+                      {{ $log->requestedOffice->Office_Name ?? 'N/A' }}.                  
+                  @elseif($log->action == 'Fully Approved')
+                      Fully Approved by all signatories.
+                  @elseif(!is_null($log->signatory) && !is_null($log->signatory->office))
+                      {{ $log->action }} by {{ $log->signatory->office->Office_Name ?? 'N/A' }}.
+                  @else
+                      {{ $log->action }}
+                  @endif
+              </div>
           </div>
           <div class="timestamp">
-            {{ \Carbon\Carbon::parse($log->Timestamp)->diffForHumans() }}
+              {{ $log->Timestamp ? \Carbon\Carbon::parse($log->Timestamp)->diffForHumans() : 'N/A' }}
           </div>
-        </div>
-      @endforeach
+      </div>
+     @endforeach  
     </div>
     
     <br>

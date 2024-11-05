@@ -21,5 +21,9 @@ class Office extends Model
     {
         return $this->belongsToMany(DocumentType::class, 'document_type_signatories', 'office_id', 'document_type_id');
     }
+    public function activityLogs()
+{
+    return $this->hasMany(ActivityLog::class, 'requested_by');
+}
 
 }
