@@ -84,7 +84,7 @@ public function index(Request $request)
         ]);
     
         // Generate the QR code for the document
-        $localIP = env('APP_URL', 'http://172.22.23.38:8000'); // Use your local IP
+        $localIP = env('APP_URL', 'http://10.0.254.23:8000'); // Use your local IP
         $qrCodeUrl = $localIP . '/qrcode/scan/' . $document->id;
         $qrCode = QrCode::format('svg')->size(200)->generate($qrCodeUrl);
         $qrCodePath = 'qrcodes/' . $document->id . '.svg';
