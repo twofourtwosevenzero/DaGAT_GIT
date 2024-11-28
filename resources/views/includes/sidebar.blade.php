@@ -1,6 +1,6 @@
 <div class="sidebar close">
   <div class="logo-details">
-    <img src="{{ asset('images/dagat_logo.png') }}" alt="logo" class="logo-img">
+    <img src="{{ asset('Images/dagat_logo.png') }}" alt="logo" class="logo-img">
     <span class="logo_name">&nbsp;&nbsp;&nbsp;DaGAT</span>
   </div>
 

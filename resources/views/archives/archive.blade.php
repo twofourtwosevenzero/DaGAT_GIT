@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Archive</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('images/dagat_logo.png') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('Images/dagat_logo.png') }}">
 
     <!-- Vite CSS -->
     @vite(['resources/css/sidebar.css', 'resources/css/archive.css'])

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="{{ asset('images/dagat_logo.png') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('Images/dagat_logo.png') }}">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     @vite(['resources/css/app.css', 'resources/css/sidebar.css','resources/css/styles.css'])
 </head>
@@ -13,7 +13,7 @@
     <div class="modal-overlay" id="modalOverlay">
         <section class="login-modal" id="loginModal">
             <div class="login-text">
-                <img src="{{ asset('images/dagat_logo.png') }}" alt="logo" class="logo-img modal-logo">
+                <img src="{{ asset('Images/dagat_logo.png') }}" alt="logo" class="logo-img modal-logo">
                 <h3>By continuing to use DaGAT, you agree to the <a href="https://www.usep.edu.ph/usep-data-privacy-statement/" class="agreement" target="_blank">University of Southeastern Philippines' Data Privacy Statement</a></h3>
                 <button class="accept-button" onclick="closeModal()">Accept</button>
             </div>
@@ -21,14 +21,14 @@
     </div>
 
     <div class="loader-overlay" id="loaderOverlay">
-        <img src="{{ asset('images/dagat_logo.png') }}" alt="logo" class="loader">
+        <img src="{{ asset('Images/dagat_logo.png') }}" alt="logo" class="loader">
         <div class="loader-text">LOGGING IN...</div>
     </div>
 
     <div class="content" id="content">
         <section class="login-container">
             <div class="logo">
-                <img src="{{ asset('images/dagat_logo.png') }}" alt="logo" class="logo-img">
+                <img src="{{ asset('Images/dagat_logo.png') }}" alt="logo" class="logo-img">
                 <div class="logo-text">
                     <h3>DaGAT</h3>
                     <span>A Document Tracking System for the CIC Local Council</span>

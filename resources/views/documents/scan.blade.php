@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="icon" href="{{ asset('images/dagat_logo.png') }}" type="image/png">
+  <link rel="icon" href="{{ asset('Images/dagat_logo.png') }}" type="image/png">
   <link rel="stylesheet" href="{{ asset('css/qrpage.css') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document Verification</title>
@@ -15,7 +15,7 @@
   <div id="white" class="container text-center bg-white p-3 rounded shadow">
     <div class="row mb-4 justify-content-center">
       <div class="col-12 col-md-6">
-        <img src="{{ asset('images/school.png') }}" alt="Council Logos" class="img-fluid mx-2">
+        <img src="{{ asset('Images/school.png') }}" alt="Council Logos" class="img-fluid mx-2">
       </div>
     </div>
     <div class="row mb-3">
