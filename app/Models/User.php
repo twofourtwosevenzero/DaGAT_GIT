@@ -33,6 +33,7 @@ class User extends Authenticatable
         return $this->hasMany(ActivityLog::class, 'user_id');
     }
 
+
     public function privilege()
     {
         return $this->belongsTo(Privilege::class, 'PRI_ID', 'id');
@@ -40,7 +41,6 @@ class User extends Authenticatable
     
     
 
-    
 
     
     

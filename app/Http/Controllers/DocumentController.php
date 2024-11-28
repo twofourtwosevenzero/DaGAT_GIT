@@ -84,7 +84,7 @@ public function index(Request $request)
         ]);
     
         // Generate the QR code for the document
-        $localIP = env('APP_URL', 'http://10.0.254.23:8000'); // Use your local IP
+        $localIP = env('APP_URL', 'http://192.168.254.107:8000'); // Use your local IP
         $qrCodeUrl = $localIP . '/qrcode/scan/' . $document->id;
         $qrCode = QrCode::format('svg')->size(200)->generate($qrCodeUrl);
         $qrCodePath = 'qrcodes/' . $document->id . '.svg';
@@ -237,12 +237,8 @@ public function index(Request $request)
             
             $this->sendSignatoryApprovalNotification($document, $signatory);
         }
-    
+
         Log::info('Signatory status updated:', ['signatory' => $signatory]);
-    
-        $allApproved = Signatory::where('QRC_ID', $qrcode->id)
-                                ->where('Status_ID', '<', 3)
-                                ->doesntExist();
     
         if ($allApproved) {
             $document->update([
