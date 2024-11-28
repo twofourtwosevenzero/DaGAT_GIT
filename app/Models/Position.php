@@ -1,7 +1,5 @@
 <?php
 
-// Position.php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,6 +13,6 @@ class Position extends Model
 
     public function users()
     {
-        return $this->hasMany(User::class, 'Position_ID');
+        return $this->hasMany(User::class, 'position_id');
     }
 }

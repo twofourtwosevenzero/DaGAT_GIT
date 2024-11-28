@@ -13,7 +13,7 @@ class CreateDocumentsTable extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('DT_ID')->constrained('document_types')->onDelete('cascade');
             $table->foreignId('Status_ID')->constrained('statuses')->onDelete('cascade');
-            $table->string('Description');
+            $table->string('Description', 64);
             $table->timestamp('Date_Created');
             $table->timestamp('Date_Approved')->nullable();
             $table->string('Document_File');

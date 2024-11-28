@@ -179,8 +179,10 @@
         <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header bg-maroon text-white">
-                <h5 class="modal-title" id="addDocumentModalLabel">Add Document</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="addDocumentModalLabel">
+                    <i class='bx bx-upload'></i> Add Document
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <!-- Modal Body -->
@@ -190,147 +192,229 @@
                         <strong>There were some problems with your input:</strong>
                         <ul class="mb-0">
                             @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
+                                <li><i class='bx bx-error'></i> {{ $error }}</li>
                             @endforeach
                         </ul>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
+
                 <form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <div class="row">
+                    <div class="row g-4">
                         <!-- Left Column -->
                         <div class="col-md-6">
-                            <!-- Document Name -->
-                            <div class="mb-4">
-                                <label for="description" class="form-label required">Document Name</label>
-                                <input type="text" name="description" id="description"
-                                    class="form-control form-control-lg" required>
-                            </div>
-                            <!-- Document Type -->
-                            <div class="mb-4">
-                                <label for="document_type" class="form-label required">Document Type</label>
-                                <select name="document_type" id="document_type_modal" class="form-select form-select-lg"
-                                    required>
-                                    <option value="" disabled selected>Select Document Type</option>
-                                    @foreach ($documentTypes as $type)
-                                        <option value="{{ $type->id }}">{{ $type->DT_Type }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <!-- Document File -->
-                            <div class="mb-4">
-                                <label for="document_file" class="form-label required">Document File</label>
-                                <input type="file" name="document_file" id="document_file"
-                                    class="form-control form-control-lg" required>
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <!-- Document Name -->
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label required">Document Name</label>
+                                        <input type="text" name="description" id="description"
+                                            class="form-control" required>
+                                    </div>
+                                    <!-- Document Type -->
+                                    <div class="mb-3">
+                                        <label for="document_type" class="form-label required">Document Type</label>
+                                        <select name="document_type" id="document_type_modal" class="form-select"
+                                            required>
+                                            <option value="" disabled selected>Select Document Type</option>
+                                            @foreach ($documentTypes as $type)
+                                                <option value="{{ $type->id }}">{{ $type->DT_Type }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <!-- Document File -->
+                                    <div class="mb-3">
+                                        <label for="document_file" class="form-label required">Document File</label>
+                                        <input type="file" name="document_file" id="document_file"
+                                            class="form-control" required>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <!-- Right Column -->
                         <div class="col-md-6">
-                            <!-- Signatories -->
-                            <div class="mb-4">
-                                <label class="form-label required">Signatories</label>
-                                <!-- Signatory Categories -->
-                                <div class="accordion" id="signatoriesAccordionModal">
-                                    <!-- College Offices -->
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header" id="headingCollegeModal">
-                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCollegeModal" aria-expanded="false" aria-controls="collapseCollegeModal">
-                                                College Offices
-                                            </button>
-                                        </h2>
-                                        <div id="collapseCollegeModal" class="accordion-collapse collapse" aria-labelledby="headingCollegeModal" data-bs-parent="#signatoriesAccordionModal">
-                                            <div class="accordion-body">
-                                                @foreach ($offices->slice(23, 7) as $office)
-                                                    <div class="form-check">
-                                                        <input type="checkbox" name="signatories[]"
-                                                            value="{{ $office->id }}" class="form-check-input signatory-checkbox-modal"
-                                                            id="signatoryModal{{ $office->id }}">
-                                                        <label class="form-check-label"
-                                                            for="signatoryModal{{ $office->id }}">{{ $office->Office_Name }}</label>
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <!-- Signatories -->
+                                    <div class="mb-3">
+                                        <label class="form-label required">Signatories</label>
+                                        <!-- Signatory Categories -->
+                                        <div class="accordion accordion-flush" id="signatoriesAccordionModal">
+                                            <!-- College Offices -->
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="headingCollegeModal">
+                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCollegeModal" aria-expanded="false" aria-controls="collapseCollegeModal">
+                                                        College Offices
+                                                    </button>
+                                                </h2>
+                                                <div id="collapseCollegeModal" class="accordion-collapse collapse" aria-labelledby="headingCollegeModal" data-bs-parent="#signatoriesAccordionModal">
+                                                    <div class="accordion-body">
+                                                        @foreach ($offices->slice(23, 7) as $office)
+                                                            <div class="form-check">
+                                                                <input type="checkbox" name="signatories[]"
+                                                                    value="{{ $office->id }}" class="form-check-input signatory-checkbox-modal"
+                                                                    id="signatoryModal{{ $office->id }}">
+                                                                <label class="form-check-label"
+                                                                    for="signatoryModal{{ $office->id }}">{{ $office->Office_Name }}</label>
+                                                            </div>
+                                                        @endforeach
                                                     </div>
-                                                @endforeach
+                                                </div>
+                                            </div>
+                                            <!-- Local Council Offices -->
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="headingLocalCouncilModal">
+                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLocalCouncilModal" aria-expanded="false" aria-controls="collapseLocalCouncilModal">
+                                                        Local Council Offices
+                                                    </button>
+                                                </h2>
+                                                <div id="collapseLocalCouncilModal" class="accordion-collapse collapse" aria-labelledby="headingLocalCouncilModal" data-bs-parent="#signatoriesAccordionModal">
+                                                    <div class="accordion-body">
+                                                        @foreach ($offices->slice(30, 7) as $office)
+                                                            <div class="form-check">
+                                                                <input type="checkbox" name="signatories[]"
+                                                                    value="{{ $office->id }}" class="form-check-input signatory-checkbox-modal"
+                                                                    id="signatoryModal{{ $office->id }}">
+                                                                <label class="form-check-label"
+                                                                    for="signatoryModal{{ $office->id }}">{{ $office->Office_Name }}</label>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Admin Offices -->
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="headingAdminModal">
+                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdminModal" aria-expanded="false" aria-controls="collapseAdminModal">
+                                                        Admin Offices
+                                                    </button>
+                                                </h2>
+                                                <div id="collapseAdminModal" class="accordion-collapse collapse" aria-labelledby="headingAdminModal" data-bs-parent="#signatoriesAccordionModal">
+                                                    <div class="accordion-body">
+                                                        @foreach ($offices->slice(0, 14) as $office)
+                                                            <div class="form-check">
+                                                                <input type="checkbox" name="signatories[]"
+                                                                    value="{{ $office->id }}" class="form-check-input signatory-checkbox-modal"
+                                                                    id="signatoryModal{{ $office->id }}">
+                                                                <label class="form-check-label"
+                                                                    for="signatoryModal{{ $office->id }}">{{ $office->Office_Name }}</label>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Services Offices -->
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="headingServicesModal">
+                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseServicesModal" aria-expanded="false" aria-controls="collapseServicesModal">
+                                                        Services Offices
+                                                    </button>
+                                                </h2>
+                                                <div id="collapseServicesModal" class="accordion-collapse collapse" aria-labelledby="headingServicesModal" data-bs-parent="#signatoriesAccordionModal">
+                                                    <div class="accordion-body">
+                                                        @foreach ($offices->slice(15, 7) as $office)
+                                                            <div class="form-check">
+                                                                <input type="checkbox" name="signatories[]"
+                                                                    value="{{ $office->id }}" class="form-check-input signatory-checkbox-modal"
+                                                                    id="signatoryModal{{ $office->id }}">
+                                                                <label class="form-check-label"
+                                                                    for="signatoryModal{{ $office->id }}">{{ $office->Office_Name }}</label>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <!-- Local Council Offices -->
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header" id="headingLocalCouncilModal">
-                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLocalCouncilModal" aria-expanded="false" aria-controls="collapseLocalCouncilModal">
-                                                Local Council Offices
-                                            </button>
-                                        </h2>
-                                        <div id="collapseLocalCouncilModal" class="accordion-collapse collapse" aria-labelledby="headingLocalCouncilModal" data-bs-parent="#signatoriesAccordionModal">
-                                            <div class="accordion-body">
-                                                @foreach ($offices->slice(30, 7) as $office)
-                                                    <div class="form-check">
-                                                        <input type="checkbox" name="signatories[]"
-                                                            value="{{ $office->id }}" class="form-check-input signatory-checkbox-modal"
-                                                            id="signatoryModal{{ $office->id }}">
-                                                        <label class="form-check-label"
-                                                            for="signatoryModal{{ $office->id }}">{{ $office->Office_Name }}</label>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Admin Offices -->
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header" id="headingAdminModal">
-                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdminModal" aria-expanded="false" aria-controls="collapseAdminModal">
-                                                Admin Offices
-                                            </button>
-                                        </h2>
-                                        <div id="collapseAdminModal" class="accordion-collapse collapse" aria-labelledby="headingAdminModal" data-bs-parent="#signatoriesAccordionModal">
-                                            <div class="accordion-body">
-                                                @foreach ($offices->slice(0, 14) as $office)
-                                                    <div class="form-check">
-                                                        <input type="checkbox" name="signatories[]"
-                                                            value="{{ $office->id }}" class="form-check-input signatory-checkbox-modal"
-                                                            id="signatoryModal{{ $office->id }}">
-                                                        <label class="form-check-label"
-                                                            for="signatoryModal{{ $office->id }}">{{ $office->Office_Name }}</label>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Services Offices -->
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header" id="headingServicesModal">
-                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseServicesModal" aria-expanded="false" aria-controls="collapseServicesModal">
-                                                Services Offices
-                                            </button>
-                                        </h2>
-                                        <div id="collapseServicesModal" class="accordion-collapse collapse" aria-labelledby="headingServicesModal" data-bs-parent="#signatoriesAccordionModal">
-                                            <div class="accordion-body">
-                                                @foreach ($offices->slice(15, 7) as $office)
-                                                    <div class="form-check">
-                                                        <input type="checkbox" name="signatories[]"
-                                                            value="{{ $office->id }}" class="form-check-input signatory-checkbox-modal"
-                                                            id="signatoryModal{{ $office->id }}">
-                                                        <label class="form-check-label"
-                                                            for="signatoryModal{{ $office->id }}">{{ $office->Office_Name }}</label>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
+                                        <!-- End of Accordion -->
                                     </div>
                                 </div>
-                                <!-- End of Accordion -->
                             </div>
                         </div>
                     </div>
                     <!-- Modal Footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-maroon">Upload</button>
+                    <div class="modal-footer mt-4">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class='bx bx-x'></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-maroon">
+                            <i class='bx bx-upload'></i> Upload
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Custom CSS for Modal -->
+<style>
+    .bg-maroon {
+        background-color: #58151c;
+    }
+    .btn-maroon {
+        background-color: #58151c;
+        color: #fff;
+    }
+    .btn-maroon:hover {
+        background-color: #660000;
+        color: #fff;
+    }
+    .form-label.required::after {
+        content: " *";
+        color: red;
+    }
+    .accordion-button {
+        background-color: #f8f9fa;
+        color: #58151c;
+    }
+    .accordion-button:not(.collapsed) {
+        color: #fff;
+        background-color: #58151c;
+    }
+    .accordion-button:focus {
+        box-shadow: none;
+    }
+    .accordion-item {
+        border: 1px solid #ddd;
+    }
+    .accordion-button::after {
+        filter: invert(29%) sepia(89%) saturate(4417%) hue-rotate(354deg) brightness(85%) contrast(101%);
+    }
+    .form-check-input:checked {
+        background-color: #58151c;
+        border-color: #58151c;
+    }
+    .btn-outline-secondary {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: #fff;
+    }
+    .modal-content {
+        border-radius: 8px;
+    }
+    .modal-header {
+        border-bottom: 1px solid #dee2e6;
+    }
+    .modal-footer {
+        border-top: 1px solid #dee2e6;
+    }
+    .card {
+        border: 1px solid #ddd;
+    }
+    .card-body {
+        padding: 1.5rem;
+    }
+    .form-control, .form-select {
+        border-radius: 4px;
+    }
+    .btn-close-white {
+        filter: invert(1);
+    }
+</style>
 
 <!-- JavaScript to Handle Predefined Signatories in Modal -->
 <script>
@@ -371,65 +455,6 @@
     });
 </script>
 
-@push('styles')
-<style>
-    /* USeP Maroon Color */
-    .bg-maroon {
-        background-color: #58151c;
-    }
-    .btn-maroon {
-        background-color: #58151c;
-        color: #fff;
-    }
-    .btn-maroon:hover {
-        background-color: #660000;
-        color: #fff;
-    }
-    .form-label.required::after {
-        content: " *";
-        color: red;
-    }
-    .accordion-button {
-        background-color: #f8f9fa;
-        color: ##58151c;
-    }
-    .accordion-button:not(.collapsed) {
-        color: #fff;
-        background-color: #58151c;
-    }
-    .accordion-button:focus {
-        box-shadow: none;
-    }
-    .accordion-item {
-        border: none;
-    }
-    .accordion-button::after {
-        filter: invert(29%) sepia(89%) saturate(4417%) hue-rotate(354deg) brightness(85%) contrast(101%);
-    }
-    .form-check-input:checked {
-        background-color: #58151c;
-        border-color: #58151c;
-    }
-    .btn-outline-secondary {
-        border-color: #6c757d;
-        color: #6c757d;
-    }
-    .btn-outline-secondary:hover {
-        background-color: #6c757d;
-        color: #fff;
-    }
-    .modal-content {
-        border: none;
-        border-radius: 0;
-    }
-    .modal-header {
-        border-bottom: none;
-    }
-    .modal-footer {
-        border-top: none;
-    }
-</style>
-@endpush
                 <!-- Edit Modal -->
                 <div id="editModal" class="modal fade">
                     <div class="modal-dialog custom-modal-width">

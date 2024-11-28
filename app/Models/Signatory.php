@@ -19,6 +19,7 @@ class Signatory extends Model
         'Received_Date',
         'Signed_Date',
         'verification_count', // Add this line
+        'name', // Ensure this field exists
     ];
 
     public function office(): BelongsTo

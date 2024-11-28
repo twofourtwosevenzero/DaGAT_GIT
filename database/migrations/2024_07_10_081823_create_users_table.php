@@ -9,12 +9,12 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->string('name', 50); // Allow more flexibility for user names
+            $table->string('email', 50)->unique(); // Extended to accommodate longer emails
             $table->integer('otp')->nullable();
-            $table->foreignId('PRI_ID')->constrained('privileges')->onDelete('cascade');
-            $table->foreignId('Position_ID')->constrained('positions')->onDelete('cascade');
-            $table->string('password');
+            $table->foreignId('PRI_ID')->nullable()->constrained('privileges')->onDelete('cascade'); // Nullable privilege
+            $table->foreignId('Position_ID')->nullable()->constrained('positions')->onDelete('cascade'); // Nullable position
+            $table->string('password', 60); // Suitable for bcrypt
             $table->rememberToken();
             $table->timestamps();
         });

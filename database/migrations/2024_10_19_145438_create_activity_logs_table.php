@@ -12,11 +12,12 @@ class CreateActivityLogsTable extends Migration
             $table->id();
             $table->foreignId('Docu_ID')->constrained('documents')->onDelete('cascade');
             $table->foreignId('Sign_ID')->nullable()->constrained('signatories')->onDelete('cascade');
-            $table->string('action');
-            $table->timestamp('Timestamp');
-            $table->string('reason')->nullable();  // Added for logging reasons for specific actions
-            $table->timestamps();
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('requested_by')->nullable()->constrained('offices')->onDelete('set null');
+            $table->string('action', 32);
+            $table->timestamp('Timestamp');
+            $table->string('reason', 32)->nullable();
+            $table->timestamps();
         });
     }
     
@@ -24,5 +25,4 @@ class CreateActivityLogsTable extends Migration
     {
         Schema::dropIfExists('activity_logs');
     }
-    
 }

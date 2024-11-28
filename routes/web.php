@@ -46,14 +46,13 @@ Route::get('/admin/dashboard', function () {
     return view('admin.dashboard');
 })->middleware(['auth', 'admin'])->name('admin.dashboard');
 
-// User management routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/usermanagement', [UserController::class, 'showUserManagement'])->name('user.showUserManagement');
-    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('user.edit');
-    Route::put('/users/{user}', [UserController::class, 'update'])->name('user.update');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('user.delete');
-    Route::post('/users', [UserController::class, 'store'])->name('user.store');
+    Route::get('/usermanagement', [UserController::class, 'index'])->name('user.index');
+    Route::post('/usermanagement', [UserController::class, 'store'])->name('user.store');
+    Route::put('/usermanagement/{id}', [UserController::class, 'update'])->name('user.update');
+    Route::delete('/usermanagement/{id}', [UserController::class, 'destroy'])->name('user.destroy');
 });
+
 
 // Office routes
 Route::middleware(['auth'])->group(function () {

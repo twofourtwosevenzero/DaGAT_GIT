@@ -12,9 +12,11 @@ class DatabaseSeeder extends Seeder
             PrivilegesTableSeeder::class,
             PositionsTableSeeder::class,
             UsersTableSeeder::class,
-            DocumentTypesTableSeeder::class,
             StatusesTableSeeder::class,
             OfficesTableSeeder::class,
+            DocumentTypesTableSeeder::class,
+            DocumentsSeeder::class,
+            ActivityLogsSeeder::class,
         ]);
     }
 }

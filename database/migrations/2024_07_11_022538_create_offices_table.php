@@ -10,8 +10,8 @@ class CreateOfficesTable extends Migration
     {
         Schema::create('offices', function (Blueprint $table) {
             $table->id();
-            $table->string('Office_Name');
-            $table->string('Office_Pin')->unique();
+            $table->string('Office_Name', 80);
+            $table->string('Office_Pin', 6)->unique();
             $table->timestamps();
         });
     }

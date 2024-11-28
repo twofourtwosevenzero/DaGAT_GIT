@@ -28,6 +28,20 @@ class User extends Authenticatable
         return $this->belongsTo(Position::class, 'Position_ID');
     }
 
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class, 'user_id');
+    }
+
+    public function privilege()
+    {
+        return $this->belongsTo(Privilege::class, 'PRI_ID', 'id');
+    }
+    
+    
+
+    
+
     
     
     

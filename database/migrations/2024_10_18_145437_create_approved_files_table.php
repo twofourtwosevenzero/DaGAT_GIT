@@ -15,8 +15,8 @@ class CreateApprovedFilesTable extends Migration
     {
         Schema::create('approved_files', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // File name
-            $table->string('path'); // File path in storage
+            $table->string('name', 32); // File name
+            $table->string('path', 128); // File path in storage
             $table->foreignId('document_type_id')->constrained('document_types')->onDelete('cascade'); // Reference to document type
             $table->date('approved_date'); // Date of approval
             $table->timestamps(); // Created and Updated timestamps

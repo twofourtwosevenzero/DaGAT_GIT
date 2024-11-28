@@ -26,7 +26,15 @@
             <div class="row gx-5">
                 <div class="col" style="margin-top: 20px">
                     <div class="card p-3 text-center" style="border-radius: 15px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-                        <div class="icon" style="font-weight:700;">Top Performing Office</div>
+                        <div class="icon" style="font-weight:700;" data-bs-toggle="tooltip" data-bs-placement="top" title="The office with the least average processing time for document approvals.">
+                            Top Performing Office
+                        </div>
+                        <script>
+                            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                                return new bootstrap.Tooltip(tooltipTriggerEl);
+                            });
+                        </script>
                         <div>
                             <h3 class="inner-h3" style="font-size:25px;">
                                 {{ $topPerformingOffice?->Office_Name ?? 'No data available' }}
@@ -65,18 +73,10 @@
                     <div class="p-3 text-center" style="color: #333; font-family: 'Quicksand', sans-serif; font-size: larger; font-weight: bold;">OFFICE METRICS CHART</div>
                     <div class="d-flex justify-content-between align-items-center" style="height: 300px;">
                         <!-- Bar Chart -->
-                        <div style="position: relative; height: 100%; width: 65%;">
+                        <div style="position: relative; height: 100%; width: 100%;">
                             <canvas id="officeMetricsChart"></canvas>
                         </div>
-                        <!-- Pie Chart -->
-                        <div style="position: relative; height: 100%; width: 30%;">
-                            <canvas id="documentsDistributionChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center" style="margin-top: 10px; font-weight: bold;">
-                        <div class="text-center" style="width: 65%; color: #333; font-family: 'Quicksand', sans-serif; margin-bottom: 10px;">Processed Documents and Processing Days</div>
-                        <div class="text-center" style="width: 30%; color: #333; font-family: 'Quicksand', sans-serif; margin-bottom: 10px;">Documents Distribution</div>
-                    </div>
+                    
                     
                     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                     <script>

@@ -53,78 +53,81 @@ class OfficeAnalyticsController extends Controller
     ];
 
     public function index()
-    {
-        $analytics = Office::select('offices.Office_Name', 
-                                    DB::raw('AVG(TIMESTAMPDIFF(DAY, signatories.Received_Date, signatories.Signed_Date)) as avg_processing_time_days'),
-                                    DB::raw('AVG(TIMESTAMPDIFF(HOUR, signatories.Received_Date, signatories.Signed_Date)) as avg_processing_time_hours'),
-                                    DB::raw('AVG(TIMESTAMPDIFF(MINUTE, signatories.Received_Date, signatories.Signed_Date)) as avg_processing_time_minutes'),
-                                    DB::raw('COUNT(signatories.id) as documents_processed'))
-                            ->join('signatories', 'offices.id', '=', 'signatories.Office_ID')
-                            ->whereNotNull('signatories.Received_Date')
-                            ->whereNotNull('signatories.Signed_Date')
-                            ->groupBy('offices.Office_Name')
-                            ->get()
-                            ->map(function ($office) {
-                                $office->Office_Name = $this->abbreviateOfficeName($office->Office_Name);
-                                return $office;});
+{
+    $analytics = Office::select(
+        'offices.Office_Name',
+        DB::raw('AVG(TIMESTAMPDIFF(DAY, signatories.Received_Date, signatories.Signed_Date)) as avg_processing_time_days'),
+        DB::raw('AVG(TIMESTAMPDIFF(HOUR, signatories.Received_Date, signatories.Signed_Date)) as avg_processing_time_hours'),
+        DB::raw('AVG(TIMESTAMPDIFF(MINUTE, signatories.Received_Date, signatories.Signed_Date)) as avg_processing_time_minutes'),
+        DB::raw('COUNT(signatories.id) as documents_processed')
+    )
+        ->join('signatories', 'offices.id', '=', 'signatories.Office_ID')
+        ->whereNotNull('signatories.Received_Date')
+        ->whereNotNull('signatories.Signed_Date')
+        ->groupBy('offices.Office_Name')
+        ->get()
+        ->map(function ($office) {
+            $office->performance_score = $office->avg_processing_time_days / max($office->documents_processed, 1);
+            $office->Office_Name = $this->abbreviateOfficeName($office->Office_Name);
+            return $office;
+        });
 
-        // Get the top-performing office based on the lowest average processing time in days
-        $topPerformingOffice = $analytics->sortBy('avg_processing_time_days')->first();
+    // Get the top-performing office based on the performance score
+    $topPerformingOffice = $analytics->sortBy('performance_score')->first();
 
-        $monthlyProcessedDocuments = DB::table('signatories')
-            ->select(DB::raw('MONTH(Received_Date) as month'), DB::raw('COUNT(*) as documents_processed'))
-            ->whereNotNull('Received_Date')
-            ->groupBy(DB::raw('MONTH(Received_Date)'))
-            ->orderBy('month')
-            ->get()
-            ->keyBy('month');
+    $monthlyProcessedDocuments = DB::table('signatories')
+        ->select(DB::raw('MONTH(Received_Date) as month'), DB::raw('COUNT(*) as documents_processed'))
+        ->whereNotNull('Received_Date')
+        ->groupBy(DB::raw('MONTH(Received_Date)'))
+        ->orderBy('month')
+        ->get()
+        ->keyBy('month');
 
-        $months = [
-            'January', 'February', 'March', 'April', 'May', 'June', 
-            'July', 'August', 'September', 'October', 'November', 'December'
-        ];
+    $months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
 
-        $monthlyProcessedDocumentsData = array_fill(0, 12, 0);
-        foreach ($monthlyProcessedDocuments as $month => $data) {
-            $monthlyProcessedDocumentsData[$month - 1] = $data->documents_processed;
-        }
+    $monthlyProcessedDocumentsData = array_fill(0, 12, 0);
+    foreach ($monthlyProcessedDocuments as $month => $data) {
+        $monthlyProcessedDocumentsData[$month - 1] = $data->documents_processed;
+    }
 
-        // Compute overall average processing time in days across all offices
-        $averageProcessingTime = Signatory::whereNotNull('Received_Date')
-            ->whereNotNull('Signed_Date')
-            ->get()
-            ->map(function ($signatory) {
-                $received = Carbon::parse($signatory->Received_Date);
-                $signed = Carbon::parse($signatory->Signed_Date);
-                return $received->diffInDays($signed);
-            })
-            ->average();
+    // Compute overall average processing time in days across all offices
+    $averageProcessingTime = Signatory::whereNotNull('Received_Date')
+        ->whereNotNull('Signed_Date')
+        ->get()
+        ->map(function ($signatory) {
+            $received = Carbon::parse($signatory->Received_Date);
+            $signed = Carbon::parse($signatory->Signed_Date);
+            return $received->diffInDays($signed);
+        })
+        ->average();
 
-        $averageProcessingTime = $averageProcessingTime ? round($averageProcessingTime, 2) : 0;
+    $averageProcessingTime = $averageProcessingTime ? round($averageProcessingTime, 2) : 0;
 
-        // Documents approved this month
-        $approvedThisMonth = Signatory::whereNotNull('Signed_Date')
+    // Documents approved this month
+    $approvedThisMonth = Signatory::whereNotNull('Signed_Date')
         ->whereMonth('Signed_Date', Carbon::now()->month)
         ->count();
-        
-        // Active signatories in the last 6 months
-        $activeSignatories = Signatory::whereNotNull('Signed_Date')
+
+    // Active signatories in the last 6 months
+    $activeSignatories = Signatory::whereNotNull('Signed_Date')
         ->where('Signed_Date', '>=', Carbon::now()->subMonths(6))
         ->distinct('Office_ID')
         ->count('Office_ID');
 
+    return view('analytics.index', compact(
+        'analytics',
+        'months',
+        'monthlyProcessedDocumentsData',
+        'topPerformingOffice',
+        'averageProcessingTime',
+        'approvedThisMonth',
+        'activeSignatories'
+    ));
+}
 
-
-        return view('analytics.index', compact(
-            'analytics', 
-            'months', 
-            'monthlyProcessedDocumentsData', 
-            'topPerformingOffice',
-            'averageProcessingTime',
-            'approvedThisMonth',
-            'activeSignatories'
-        ));        
-    }
 
         // Helper function to abbreviate office names
         private function abbreviateOfficeName($officeName)

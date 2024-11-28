@@ -139,6 +139,16 @@ label {
     box-sizing: border-box;
 }
 
+.form-select {
+    width: 100%; /* Ensures dropdown spans the full width of its container */
+    text-overflow: ellipsis; /* Prevents text from overflowing */
+    white-space: nowrap; /* Prevents wrapping of text */
+    overflow: hidden; /* Hides overflowing text */
+}
+
+
+
+
 .password-group {
     position: relative;
 }
