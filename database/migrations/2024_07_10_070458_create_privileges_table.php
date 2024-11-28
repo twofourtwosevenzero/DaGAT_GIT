@@ -10,7 +10,7 @@ class CreatePrivilegesTable extends Migration
     {
         Schema::create('privileges', function (Blueprint $table) {
             $table->id();
-            $table->string('Privilege_Level');
+            $table->string('Privilege_Level', 20); // Optimized from default 255 to 50
             $table->timestamps();
         });
     }

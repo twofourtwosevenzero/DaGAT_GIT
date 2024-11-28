@@ -30,35 +30,36 @@
     <hr>
     <br>
     <div id="activityLogsContainer">
-      @php
-        $logs = $activityLogs->sortByDesc('Timestamp');
-      @endphp
-      @foreach($logs as $log)
-      <div class="activity-log" data-timestamp="{{ optional($log->Timestamp)->timestamp }}">
-          <div>
-              <div class="title">{{ $log->document->Description ?? 'N/A' }}</div>
-              <div class="description">
-                  @if($log->action == 'Deleted')
-                      Deleted by {{ $log->user->name ?? 'Unknown User' }}.
-                      <br><strong>Reason:</strong> {{ $log->reason ?? 'No reason provided' }}
-                      @elseif($log->action == 'Revision Requested')
-                      Revision Requested by
-                      {{ $log->requestedOffice->Office_Name ?? 'N/A' }}.                  
-                  @elseif($log->action == 'Fully Approved')
-                      Fully Approved by all signatories.
-                  @elseif(!is_null($log->signatory) && !is_null($log->signatory->office))
-                      {{ $log->action }} by {{ $log->signatory->office->Office_Name ?? 'N/A' }}.
-                  @else
-                      {{ $log->action }}
-                  @endif
-              </div>
-          </div>
-          <div class="timestamp">
-              {{ $log->Timestamp ? \Carbon\Carbon::parse($log->Timestamp)->diffForHumans() : 'N/A' }}
-          </div>
-      </div>
-     @endforeach  
+        @php
+            $logs = $activityLogs->sortByDesc('Timestamp');
+        @endphp
+        @foreach($logs as $log)
+            <div class="activity-log" data-timestamp="{{ optional($log->Timestamp)->timestamp }}">
+                <div>
+                    <div class="title">{{ $log->document->Description ?? 'N/A' }}</div>
+                    <div class="description">
+                        @if($log->action == 'Deleted')
+                            Deleted by {{ $log->user->name ?? 'Unknown User' }}.
+                            <br><strong>Reason:</strong> {{ $log->reason ?? 'No reason provided' }}
+                        @elseif($log->action == 'Revision Requested')
+                            Revision Requested by {{ $log->office->Office_Name ?? 'Unknown Office' }}.
+                            <br><strong>Reason:</strong> {{ $log->reason ?? 'No reason provided' }}
+                        @elseif($log->action == 'Fully Approved')
+                            Fully Approved by all signatories.
+                        @elseif(!is_null($log->signatory))
+                            {{ $log->action }} by {{ $log->signatory->office->Office_Name ?? 'Unknown Signatory' }}.
+                        @else
+                            {{ $log->action }}
+                        @endif
+                    </div>
+                </div>
+                <div class="timestamp">
+                    {{ $log->Timestamp ? \Carbon\Carbon::parse($log->Timestamp)->diffForHumans() : 'N/A' }}
+                </div>
+            </div>
+        @endforeach  
     </div>
+    
     
     <br>
   </div>

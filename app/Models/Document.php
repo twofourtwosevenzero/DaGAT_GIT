@@ -40,15 +40,15 @@ class Document extends Model
         return $this->hasOne(QuickResponseCode::class, 'Docu_ID');
     }
 
-    // Define the relationship with Signatory
     public function signatories()
     {
-    return $this->hasMany(Signatory::class, 'QRC_ID', 'id');
+        return $this->hasManyThrough(
+            Signatory::class,
+            QuickResponseCode::class,
+            'Docu_ID', // Foreign key on QuickResponseCode table
+            'QRC_ID',  // Foreign key on Signatory table
+            'id',      // Local key on Document table
+            'id'       // Local key on QuickResponseCode table
+        );
     }
-
-    public function qrcodes()
-    {
-        return $this->hasMany(QuickResponseCode::class, 'Docu_ID');
-    }
-
 }

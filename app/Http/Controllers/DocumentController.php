@@ -84,7 +84,7 @@ public function index(Request $request)
         ]);
     
         // Generate the QR code for the document
-        $localIP = env('APP_URL'); // Use your local IP
+        $localIP = env('APP_URL', 'http://192.168.254.107:8000'); // Use your local IP
         $qrCodeUrl = $localIP . '/qrcode/scan/' . $document->id;
         $qrCode = QrCode::format('svg')->size(200)->generate($qrCodeUrl);
         $qrCodePath = 'qrcodes/' . $document->id . '.svg';
@@ -201,11 +201,11 @@ public function index(Request $request)
 
         if ($signatory->Status_ID == 1) {
             $signatory->update([
-                'Status_ID' => 2, // Assuming 2 is the 'Received by Office' status
+                'Status_ID' => 2, // Received by Office
                 'Received_Date' => now(),
             ]);
             ActivityLog::create([
-                'Docu_ID' => $signatory->QRC_ID,
+                'Docu_ID' => $document->id, // Corrected: Use the Document ID
                 'Sign_ID' => $signatory->id,
                 'action' => 'Received',
                 'Timestamp' => now(),
@@ -213,17 +213,20 @@ public function index(Request $request)
             $statusMessage = 'Document has been Received.';
         } elseif ($signatory->Status_ID == 2) {
             $signatory->update([
-                'Status_ID' => 3, // Assuming 3 is the 'Approved by Office' status
+                'Status_ID' => 3, // Approved by Office
                 'Signed_Date' => now(),
             ]);
             ActivityLog::create([
-                'Docu_ID' => $signatory->QRC_ID,
+                'Docu_ID' => $document->id, // Corrected: Use the Document ID
                 'Sign_ID' => $signatory->id,
                 'action' => 'Approved',
                 'Timestamp' => now(),
             ]);
             $statusMessage = 'Document has been Approved.';
+            
+            $this->sendSignatoryApprovalNotification($document, $signatory);
         }
+    
 
         Log::info('Signatory status updated:', ['signatory' => $signatory]);
 
@@ -295,23 +298,37 @@ public function index(Request $request)
 
     public function destroy(Request $request, $id)
     {
-        $document = Document::with('qrcodes')->findOrFail($id);
-        $deletedStatus = Status::where('Status_Name', 'Deleted')->firstOrFail();
+        // Validate the delete reason
+        $validatedData = $request->validate([
+            'deleteReason' => 'required|string|max:255',
+        ]);
 
+        // Retrieve the document
+        $document = Document::findOrFail($id);
+
+        // Retrieve the authenticated user
+        $user = Auth::user();
+
+        // Log the deletion with user association
         ActivityLog::create([
             'Docu_ID' => $document->id,
             'Sign_ID' => null,
             'action' => 'Deleted',
             'Timestamp' => now(),
-            'reason' => $request->input('deleteReason'),
+            'reason' => $validatedData['deleteReason'],
+            'user_id' => $user->id, // Associate with the authenticated user
+            'requested_by' => null,  // Set to null if not applicable
         ]);
 
+        // Update the document's status to 'Deleted'
+        $deletedStatus = Status::where('Status_Name', 'Deleted')->firstOrFail();
         $document->update([
             'Status_ID' => $deletedStatus->id,
         ]);
 
         return redirect()->route('documents.index')->with('success', 'Document deleted successfully.');
     }
+
 
     protected function sendApprovalNotification($document)
     {
@@ -323,7 +340,7 @@ public function index(Request $request)
         $lastApprovedOffice = $lastApprovedSignatory ? $lastApprovedSignatory->office : null;
     
         $recipientEmails = [
-            'ilaasumbrado02393@usep.edu.ph',
+            'dbjbsantos02094@usep.edu.ph',
         ]; // Replace with the actual recipient emails
     
         Mail::to($recipientEmails)->send(new DocumentApproved($document, $lastApprovedOffice));
@@ -369,14 +386,32 @@ public function index(Request $request)
             'action' => 'Revision Requested',
             'Timestamp' => now(),
             'reason' => $validatedData['revision_reason'],
-            'requested_by' => $office->id, // This should now store the requesting office's ID
+            'requested_by' => $office->id,
         ]);
+    
+        // Send email notification
+        $this->sendRevisionRequestNotification($document, $office, $validatedData['revision_type'], $validatedData['revision_reason']);
     
         return redirect()->route('documents.show', $documentId)->with('success', 'Revision request submitted successfully.');
     }
     
-    
-    
+    protected function sendRevisionRequestNotification($document, $office, $revisionType, $revisionReason)
+{
+    // Get the recipient emails. Assuming the document has a user associated
+    $recipientEmails = ['dbjbsantos02094@usep.edu.ph']; // You can modify this as needed
+
+    Mail::to($recipientEmails)->send(new \App\Mail\DocumentRevisionRequested($document, $office, $revisionType, $revisionReason));
+}
+
+protected function sendSignatoryApprovalNotification($document, $signatory)
+{
+
+    // Prepare recipient emails
+    $recipientEmails = ['dbjbsantos02094@usep.edu.ph'];
+
+    Mail::to($recipientEmails)->send(new \App\Mail\SignatoryApprovedNotification($document, $signatory));
+}
+
     public function getRecentActivity()
 {
     $recentLogs = ActivityLog::with('document', 'signatory.office')
@@ -398,4 +433,5 @@ public function getSignatories($id)
 }
 
     
+
 }

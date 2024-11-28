@@ -25,4 +25,7 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        port: 3000, // Replace with an unused port, e.g., 3000
+      },
 });

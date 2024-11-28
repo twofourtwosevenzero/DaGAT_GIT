@@ -10,7 +10,7 @@ class CreatePositionsTable extends Migration
     {
         Schema::create('positions', function (Blueprint $table) {
             $table->id();
-            $table->string('position_name');
+            $table->string('position_name', 24); // Optimized from default 255
             $table->timestamps();
         });
     }
