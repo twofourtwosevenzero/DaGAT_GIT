@@ -11,30 +11,47 @@ class ActivityLogController extends Controller
     public function index(Request $request)
     {
         $query = ActivityLog::with(['document', 'signatory.office', 'user'])->orderBy('Timestamp', 'desc');
-                        
-        if ($request->has('description') && $request->description != '') {
+
+        // Filter by description
+        if ($request->filled('description')) {
             $query->whereHas('document', function($q) use ($request) {
                 $q->where('Description', 'like', '%' . $request->description . '%');
             });
         }
 
-        if ($request->has('action') && $request->action != '') {
+        // Filter by action
+        if ($request->filled('action')) {
             $query->where('action', 'like', '%' . $request->action . '%');
         }
 
-        if ($request->has('user') && $request->user != '') {
+        // Filter by user
+        if ($request->filled('user')) {
             $query->whereHas('user', function($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->user . '%');
             });
         }
 
-        if ($request->has('start_date') && $request->has('end_date')) {
-            $query->whereBetween('Timestamp', [$request->start_date, $request->end_date]);
+        // Filter by date range
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            try {
+                $start = Carbon::parse($request->start_date)->startOfDay();
+                $end = Carbon::parse($request->end_date)->endOfDay();
+                $query->whereBetween('Timestamp', [$start, $end]);
+            } catch (\Exception $e) {
+                // If parsing fails, you can handle the error or fallback here
+            }
         }
 
         $activityLogs = $query->get();
-        
-        return view('activitylogs.index', compact('activityLogs'));
+
+        return view('activitylogs.index', compact('activityLogs'))
+            ->with([
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'description' => $request->description,
+                'action' => $request->action,
+                'user' => $request->user
+            ]);
     }
 
     public function create()

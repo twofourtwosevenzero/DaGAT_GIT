@@ -22,6 +22,29 @@
             <button id="downloadPdf" class="btn btn-primary" style="background-color: #470303; border-color: #470303;">Download PDF</button>
         </div>
         <hr>
+
+                <!-- Date Filter Form -->
+                <form method="GET" class="mb-4">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="start_date" class="form-label">Start Date:</label>
+                            <input type="date" name="start_date" id="start_date" class="form-control"
+                                   value="{{ request('start_date') ?? $start_date }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="end_date" class="form-label">End Date:</label>
+                            <input type="date" name="end_date" id="end_date" class="form-control"
+                                   value="{{ request('end_date') ?? $end_date }}">
+                        </div>
+                        <div class="col-md-3 align-self-end">
+                            <button type="submit" class="btn btn-maroon mt-2" style="background-color: #470303; color: #fff;">
+                                Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <!-- End of Date Filter Form -->
+
         <div class="container px-4 text-center">
             <div class="row gx-5">
                 <div class="col" style="margin-top: 20px">

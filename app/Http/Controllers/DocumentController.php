@@ -22,32 +22,34 @@ use App\Mail\DocumentApproved;
 
 class DocumentController extends Controller
 {
-public function index(Request $request)
-{
-    $query = Document::with('user', 'documentType', 'status');
-    $deletedStatus = Status::where('Status_Name', 'Deleted')->first();
-
-    if ($request->has('show_deleted') && $request->show_deleted == true) {
-        $documents = $query->get();
-    } else {
-        $documents = $query->where('Status_ID', '!=', $deletedStatus->id)->get();
-    }
-
-    $documentTypes = DocumentType::all();
-    $offices = Office::all();
-
-    // Fetch predefined signatories for all document types
-    $predefinedSignatories = DB::table('document_type_signatories')
-        ->select('document_type_id', 'signatory_id')
-        ->get()
-        ->groupBy('document_type_id')
-        ->map(function ($item) {
-            return $item->pluck('signatory_id')->toArray();
-        });
-
-    return view('documents.index', compact('documents', 'documentTypes', 'offices', 'predefinedSignatories'));
+    public function index(Request $request)
+    {
+        $query = Document::with('user', 'documentType', 'status');
+        $deletedStatus = Status::where('Status_Name', 'Deleted')->first();
     
+        if ($request->has('show_deleted') && $request->show_deleted == true) {
+            $documents = $query->orderBy('Date_Created', 'desc')->get(); // Order by most recent
+        } else {
+            $documents = $query->where('Status_ID', '!=', $deletedStatus->id)
+                ->orderBy('Date_Created', 'desc') // Order by most recent
+                ->get();
+        }
+    
+        $documentTypes = DocumentType::all();
+        $offices = Office::all();
+    
+        // Fetch predefined signatories for all document types
+        $predefinedSignatories = DB::table('document_type_signatories')
+            ->select('document_type_id', 'signatory_id')
+            ->get()
+            ->groupBy('document_type_id')
+            ->map(function ($item) {
+                return $item->pluck('signatory_id')->toArray();
+            });
+    
+        return view('documents.index', compact('documents', 'documentTypes', 'offices', 'predefinedSignatories'));
     }
+    
     public function create()
     {   
         $predefinedSignatories = DB::table('document_type_signatories')
@@ -84,7 +86,7 @@ public function index(Request $request)
         ]);
     
         // Generate the QR code for the document
-        $localIP = env('APP_URL', 'http://172.16.210.26:8000'); // Use your local IP
+        $localIP = env('APP_URL', 'http://192.168.0.122:8000'); // Use your local IP
         $qrCodeUrl = $localIP . '/qrcode/scan/' . $document->id;
         $qrCode = QrCode::format('svg')->size(200)->generate($qrCodeUrl);
         $qrCodePath = 'qrcodes/' . $document->id . '.svg';
@@ -239,21 +241,30 @@ public function index(Request $request)
         }
 
         Log::info('Signatory status updated:', ['signatory' => $signatory]);
-    
-        if ($allApproved) {
-            $document->update([
-                'Status_ID' => 3, // Assuming 3 is the 'Approved' status
-                'Date_Approved' => now(),
-            ]);
-            ActivityLog::create([
-                'Docu_ID' => $document->id,
-                'Sign_ID' => null,
-                'action' => 'Fully Approved',
-                'Timestamp' => now(),
-            ]);
-    
-            $this->sendApprovalNotification($document);
-        }
+        
+            // Define `$allApproved`
+            $document->refresh(); // Reload the document and its relations if needed
+            $allApproved = $document->qrcode->signatories->every(function ($signatory) {
+                return $signatory->Status_ID === 3;
+            });
+            
+
+            if ($allApproved) {
+                $document->update([
+                    'Status_ID' => 3,
+                    'Date_Approved' => now(),
+                ]);
+            
+                ActivityLog::create([
+                    'Docu_ID' => $document->id,
+                    'Sign_ID' => null,
+                    'action' => 'Fully Approved',
+                    'Timestamp' => now(),
+                ]);
+            
+                $this->sendApprovalNotification($document);
+            }
+            
     
         $qrcode->increment('Usage_Count');
     

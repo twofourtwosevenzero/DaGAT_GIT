@@ -6,6 +6,7 @@ use App\Models\Signatory;
 use App\Models\Office;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 
 class OfficeAnalyticsController extends Controller
@@ -52,86 +53,128 @@ class OfficeAnalyticsController extends Controller
         'College of Technology LC' => 'CT LC',
     ];
 
-    public function index()
-{
-    $analytics = Office::select(
-        'offices.Office_Name',
-        DB::raw('AVG(TIMESTAMPDIFF(DAY, signatories.Received_Date, signatories.Signed_Date)) as avg_processing_time_days'),
-        DB::raw('AVG(TIMESTAMPDIFF(HOUR, signatories.Received_Date, signatories.Signed_Date)) as avg_processing_time_hours'),
-        DB::raw('AVG(TIMESTAMPDIFF(MINUTE, signatories.Received_Date, signatories.Signed_Date)) as avg_processing_time_minutes'),
-        DB::raw('COUNT(signatories.id) as documents_processed')
-    )
-        ->join('signatories', 'offices.id', '=', 'signatories.Office_ID')
-        ->whereNotNull('signatories.Received_Date')
-        ->whereNotNull('signatories.Signed_Date')
-        ->groupBy('offices.Office_Name')
-        ->get()
-        ->map(function ($office) {
-            $office->performance_score = $office->avg_processing_time_days / max($office->documents_processed, 1);
-            $office->Office_Name = $this->abbreviateOfficeName($office->Office_Name);
-            return $office;
-        });
+    public function index(Request $request)
+    {
+        // Parse the date filters if provided
+        $start_date = $request->has('start_date') ? Carbon::parse($request->start_date)->startOfDay() : null;
+        $end_date = $request->has('end_date') ? Carbon::parse($request->end_date)->endOfDay() : null;
 
-    // Get the top-performing office based on the performance score
-    $topPerformingOffice = $analytics->sortBy('performance_score')->first();
+        // Base query for signatories that have both Received_Date and Signed_Date
+        $signatoriesQuery = Signatory::query()
+            ->whereNotNull('Received_Date')
+            ->whereNotNull('Signed_Date');
 
-    $monthlyProcessedDocuments = DB::table('signatories')
-        ->select(DB::raw('MONTH(Received_Date) as month'), DB::raw('COUNT(*) as documents_processed'))
-        ->whereNotNull('Received_Date')
-        ->groupBy(DB::raw('MONTH(Received_Date)'))
-        ->orderBy('month')
-        ->get()
-        ->keyBy('month');
+        // Apply date filters if provided
+        if ($start_date && $end_date) {
+            // Filter documents processed (signed) between these dates
+            $signatoriesQuery->whereBetween('Signed_Date', [$start_date, $end_date]);
+        }
 
-    $months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
+        // Retrieve metrics by joining offices and signatories
+        $analytics = Office::select(
+            'offices.Office_Name',
+            DB::raw('AVG(TIMESTAMPDIFF(DAY, signatories.Received_Date, signatories.Signed_Date)) as avg_processing_time_days'),
+            DB::raw('AVG(TIMESTAMPDIFF(HOUR, signatories.Received_Date, signatories.Signed_Date)) as avg_processing_time_hours'),
+            DB::raw('AVG(TIMESTAMPDIFF(MINUTE, signatories.Received_Date, signatories.Signed_Date)) as avg_processing_time_minutes'),
+            DB::raw('COUNT(signatories.id) as documents_processed')
+        )
+            ->joinSub($signatoriesQuery, 'signatories', function ($join) {
+                $join->on('offices.id', '=', 'signatories.Office_ID');
+            })
+            ->groupBy('offices.Office_Name')
+            ->get()
+            ->map(function ($office) {
+                $office->performance_score = $office->avg_processing_time_days / max($office->documents_processed, 1);
+                $office->Office_Name = $this->abbreviateOfficeName($office->Office_Name);
+                return $office;
+            });
 
-    $monthlyProcessedDocumentsData = array_fill(0, 12, 0);
-    foreach ($monthlyProcessedDocuments as $month => $data) {
-        $monthlyProcessedDocumentsData[$month - 1] = $data->documents_processed;
+        // Get the top-performing office based on the performance score
+        $topPerformingOffice = $analytics->sortBy('performance_score')->first();
+
+        // Monthly processed documents (based on signed date)
+        $monthlyQuery = Signatory::query()
+            ->whereNotNull('Received_Date')
+            ->whereNotNull('Signed_Date');
+
+        // Apply date filters to monthly query if provided
+        if ($start_date && $end_date) {
+            $monthlyQuery->whereBetween('Signed_Date', [$start_date, $end_date]);
+        }
+
+        $monthlyProcessedDocuments = $monthlyQuery
+            ->select(DB::raw('MONTH(Signed_Date) as month'), DB::raw('COUNT(*) as documents_processed'))
+            ->groupBy(DB::raw('MONTH(Signed_Date)'))
+            ->orderBy('month')
+            ->get()
+            ->keyBy('month');
+
+        $months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+
+        $monthlyProcessedDocumentsData = array_fill(0, 12, 0);
+        foreach ($monthlyProcessedDocuments as $month => $data) {
+            $monthlyProcessedDocumentsData[$month - 1] = $data->documents_processed;
+        }
+
+        // Compute overall average processing time in days
+        $allSignatoriesQuery = Signatory::whereNotNull('Received_Date')->whereNotNull('Signed_Date');
+
+        if ($start_date && $end_date) {
+            $allSignatoriesQuery->whereBetween('Signed_Date', [$start_date, $end_date]);
+        }
+
+        $averageProcessingTime = $allSignatoriesQuery->get()
+            ->map(function ($signatory) {
+                $received = Carbon::parse($signatory->Received_Date);
+                $signed = Carbon::parse($signatory->Signed_Date);
+                return $received->diffInDays($signed);
+            })
+            ->average();
+
+        $averageProcessingTime = $averageProcessingTime ? round($averageProcessingTime, 2) : 0;
+
+        // Documents approved this month
+        $approvedThisMonthQuery = Signatory::whereNotNull('Signed_Date')
+            ->whereMonth('Signed_Date', Carbon::now()->month);
+
+        if ($start_date && $end_date) {
+            $approvedThisMonthQuery->whereBetween('Signed_Date', [$start_date, $end_date]);
+        }
+
+        $approvedThisMonth = $approvedThisMonthQuery->count();
+
+        // Active signatories in the last 6 months
+        $activeSignatoriesQuery = Signatory::whereNotNull('Signed_Date')
+            ->where('Signed_Date', '>=', Carbon::now()->subMonths(6));
+
+        if ($start_date && $end_date) {
+            $activeSignatoriesQuery->whereBetween('Signed_Date', [$start_date, $end_date]);
+        }
+
+        $activeSignatories = $activeSignatoriesQuery->distinct('Office_ID')
+            ->count('Office_ID');
+
+        return view('analytics.index', compact(
+            'analytics',
+            'months',
+            'monthlyProcessedDocumentsData',
+            'topPerformingOffice',
+            'averageProcessingTime',
+            'approvedThisMonth',
+            'activeSignatories'
+        ))->with([
+            'start_date' => $start_date ? $start_date->format('Y-m-d') : null,
+            'end_date' => $end_date ? $end_date->format('Y-m-d') : null,
+        ]);
     }
 
-    // Compute overall average processing time in days across all offices
-    $averageProcessingTime = Signatory::whereNotNull('Received_Date')
-        ->whereNotNull('Signed_Date')
-        ->get()
-        ->map(function ($signatory) {
-            $received = Carbon::parse($signatory->Received_Date);
-            $signed = Carbon::parse($signatory->Signed_Date);
-            return $received->diffInDays($signed);
-        })
-        ->average();
 
-    $averageProcessingTime = $averageProcessingTime ? round($averageProcessingTime, 2) : 0;
-
-    // Documents approved this month
-    $approvedThisMonth = Signatory::whereNotNull('Signed_Date')
-        ->whereMonth('Signed_Date', Carbon::now()->month)
-        ->count();
-
-    // Active signatories in the last 6 months
-    $activeSignatories = Signatory::whereNotNull('Signed_Date')
-        ->where('Signed_Date', '>=', Carbon::now()->subMonths(6))
-        ->distinct('Office_ID')
-        ->count('Office_ID');
-
-    return view('analytics.index', compact(
-        'analytics',
-        'months',
-        'monthlyProcessedDocumentsData',
-        'topPerformingOffice',
-        'averageProcessingTime',
-        'approvedThisMonth',
-        'activeSignatories'
-    ));
-}
-
-
-        // Helper function to abbreviate office names
-        private function abbreviateOfficeName($officeName)
-        {
-            return $this->officeAbbreviations[$officeName] ?? $officeName;
-        }
+    // Helper function to abbreviate office names
+    private function abbreviateOfficeName($officeName)
+    {
+        return $this->officeAbbreviations[$officeName] ?? $officeName;
+    }
 }

@@ -41,13 +41,13 @@
     </li>
 
     <!-- Activity Log-->
-    <li id="activitylog" class="{{ Request::is('activitylog') ? 'active' : '' }}">
-      <a href="{{ url('/activitylog') }}" target="_self">
+    <li id="activitylogs" class="{{ Request::is('activitylogs') ? 'active' : '' }}">
+      <a href="{{ url('/activitylogs') }}" target="_self">
         <i class='bx bx-list-ul'></i>
         <span class="link_name">Activity Log</span>
       </a>
       <ul class="sub-menu blank">
-        <li><a class="link_name" href="{{ url('/activitylog') }}" target="_self">Activity Log</a></li>
+        <li><a class="link_name" href="{{ url('/activitylogs') }}" target="_self">Activity Log</a></li>
       </ul>
     </li>
 

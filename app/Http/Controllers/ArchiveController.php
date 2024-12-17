@@ -7,18 +7,16 @@ use App\Models\ApprovedFile;
 use App\Models\DocumentType;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Database\QueryException;
 
 class ArchiveController extends Controller
 {
-    
     public function listFiles()
-{
-    $files = \App\Models\ApprovedFile::with('documentType')->get();
-    $documentTypes = DocumentType::all(); // Fetch document types
-    
-    return view('archives.archive', compact('files', 'documentTypes')); // Pass document types to the view
-}
+    {
+        $files = ApprovedFile::with('documentType')->get();
+        $documentTypes = DocumentType::all(); // Fetch all document types for the filter & upload form
+        return view('archives.archive', compact('files', 'documentTypes'));
+    }
 
     public function uploadFile(Request $request)
     {
@@ -26,43 +24,44 @@ class ArchiveController extends Controller
             'file' => 'required|mimes:pdf,docx,xlsx|max:2048',
             'name' => 'required|string|max:100',
             'document_type_id' => 'required|exists:document_types,id',
+            'approved_date' => 'nullable|date' // Optional date input
         ]);
 
-        $file = $request->file('file');
-        $filename = time() . '_' . $file->getClientOriginalName();
-        $path = $file->storeAs('documents', $filename, 'public');
+        try {
+            $file = $request->file('file');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('documents', $filename, 'public');
 
-        $fileRecord = new \App\Models\ApprovedFile();
-        $fileRecord->name = $request->name;
-        $fileRecord->path = $path;
-        $fileRecord->document_type_id = $request->document_type_id;
-        $fileRecord->approved_date = Carbon::now();
-        $fileRecord->save();
+            $fileRecord = new ApprovedFile();
+            $fileRecord->name = $request->name;
+            $fileRecord->path = $path;
+            $fileRecord->document_type_id = $request->document_type_id;
+            $fileRecord->approved_date = $request->approved_date ? Carbon::parse($request->approved_date) : Carbon::now();
+            $fileRecord->save();
 
-        return redirect()->route('archives.listFiles')->with('success', 'File uploaded successfully.');
+            return redirect()->route('archives.listFiles')->with('success', 'File uploaded successfully.');
+        } catch (QueryException $e) {
+            return redirect()->back()->withInput()->with('error', 'An error occurred while uploading the file. Please try again.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->with('error', 'An unexpected error occurred. Please contact support.');
+        }
     }
-
 
     public function destroy($id)
     {
-        $file = ApprovedFile::find($id);
-
-        // Delete the file
-        if ($file) {
-            // Debugging line
-            Log::info('File path: ' . $file->path);
-
-            if (Storage::exists($file->path)) {
-                Storage::delete($file->path);
-                Log::info('File deleted: ' . $file->path); // Log success
+        try {
+            $file = ApprovedFile::find($id);
+            if ($file) {
+                if (Storage::disk('public')->exists($file->path)) {
+                    Storage::disk('public')->delete($file->path);
+                }
+                $file->delete();
+                return redirect()->route('archives.listFiles')->with('success', 'File deleted successfully.');
             } else {
-                Log::warning('File does not exist: ' . $file->path); // Log failure
+                return redirect()->route('archives.listFiles')->with('error', 'File not found.');
             }
-            $file->delete();
+        } catch (\Exception $e) {
+            return redirect()->route('archives.listFiles')->with('error', 'An error occurred while deleting the file. Please try again.');
         }
-
-        return redirect()->route('archives.listFiles')->with('success', 'File deleted successfully');
     }
-    
-    
 }

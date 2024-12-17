@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Archive</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('Images/dagat_logo.png') }}">
 
-    <!-- Vite CSS -->
     @vite(['resources/css/sidebar.css', 'resources/css/archive.css'])
 
     <!-- Boxicons CDN Link -->
@@ -19,6 +17,48 @@
 
     <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" rel="stylesheet">
+
+    <style>
+        .floating-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            background-color: #58151c;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .floating-btn:hover {
+            background-color: #660000;
+        }
+
+        .container.bg-light {
+            position: relative;
+            padding-bottom: 80px; /* make space for the floating button */
+        }
+
+        .dragover {
+            border: 2px dashed #007bff;
+        }
+
+        .file-list-item {
+            padding: 5px 0;
+        }
+
+        .filter-container {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
 </head>
 
 <body>
@@ -30,20 +70,42 @@
             <br>
             <h3>&nbsp;ARCHIVE</h3>
             <hr>
+
+            <!-- Floating Add Button -->
             <div class="container-add">
                 <button class="floating-btn" id="uploadButton">
                     <i class='bx bx-plus'></i>
                 </button>
             </div>
 
+            <!-- If global notifications are in sidebar, they'll appear automatically -->
+            <!-- Otherwise, you can uncomment this block:
             @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
+                <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             @endif
 
-            <div class="table-controls">
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            -->
+
+            <div class="table-controls mb-3">
                 <div class="filter-container">
+                    <div>
+                        <label for="filterDocType" class="form-label">Filter by Document Type:</label>
+                        <select id="filterDocType" class="form-select form-select-sm">
+                            <option value="">All Types</option>
+                            @foreach($documentTypes as $documentType)
+                                <option value="{{ $documentType->DT_Type }}">{{ $documentType->DT_Type }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div>
                         <label for="filterMonth" class="form-label">Filter by Month:</label>
                         <select id="filterMonth" class="form-select form-select-sm">
@@ -83,6 +145,13 @@
                         <td>{{ $file->approved_date->format('d-m-Y') }}</td>
                         <td>
                             <a href="{{ Storage::url($file->path) }}" target="_blank" class="btn btn-gradientv btn-sm">View File</a>
+                            <form action="{{ route('archives.destroy', $file->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this file?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class='bx bx-trash'></i> Delete
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     @endforeach
@@ -102,7 +171,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                    <form id="uploadForm" action="{{ route('archives.uploadFile') }}" method="post" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3 text-center border rounded py-4" id="upload-area" style="cursor: pointer;">
                             <i class="bx bxs-file-doc bx-lg" id="icon"></i>
@@ -124,6 +193,11 @@
                                     <option value="{{ $documentType->id }}">{{ $documentType->DT_Type }}</option>
                                 @endforeach
                             </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="approved_date" class="form-label">Approved Date:</label>
+                            <input type="date" name="approved_date" id="approved_date" class="form-control" placeholder="YYYY-MM-DD">
                         </div>
 
                         <div class="d-grid">
@@ -156,13 +230,13 @@
                     "lengthMenu": "Show _MENU_ entries",
                     "search": "Search:"
                 },
-                "order": [[2, "desc"]] // Sort by the third column (Approved Date) in descending order
+                "order": [[2, "desc"]] // Sort by Approved Date descending
             });
 
             // Move DataTables controls
             $('#table-controls-placeholder').append($('.dataTables_length, .dataTables_filter'));
 
-            $('#filterMonth, #filterYear').on('change', function() {
+            $('#filterMonth, #filterYear, #filterDocType').on('change', function() {
                 table.draw();
             });
 
@@ -170,14 +244,17 @@
                 function(settings, data, dataIndex) {
                     var filterMonth = parseInt($('#filterMonth').val(), 10);
                     var filterYear = parseInt($('#filterYear').val(), 10);
-                    var date = new Date(data[2].split('-').reverse().join('-'));
-                    var month = date.getMonth() + 1;
-                    var year = date.getFullYear();
+                    var filterDocType = $('#filterDocType').val();
 
-                    if (
+                    var docType = data[1]; // Document Type column
+                    var dateParts = data[2].split('-'); // d-m-Y
+                    var day = parseInt(dateParts[0]);
+                    var month = parseInt(dateParts[1]);
+                    var year = parseInt(dateParts[2]);
+
+                    if ((filterDocType === '' || docType === filterDocType) &&
                         (isNaN(filterMonth) || filterMonth === month) &&
-                        (isNaN(filterYear) || filterYear === year)
-                    ) {
+                        (isNaN(filterYear) || filterYear === year)) {
                         return true;
                     }
                     return false;
@@ -229,5 +306,4 @@
         });
     </script>
 </body>
-
 </html>

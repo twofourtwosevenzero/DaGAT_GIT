@@ -15,8 +15,6 @@ class DatabaseSeeder extends Seeder
             StatusesTableSeeder::class,
             OfficesTableSeeder::class,
             DocumentTypesTableSeeder::class,
-            DocumentsSeeder::class,
-            ActivityLogsSeeder::class,
             DocumentTypeSignatoriesSeeder::class,
         ]);
     }

@@ -69,18 +69,19 @@ Route::get('/aboutus', function () {
     return view('aboutus/aboutus');
 })->name('aboutus');
 
-// Activity Log route
+// Activity Log routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/activitylog', [ActivityLogController::class, 'index'])->name('activitylog.index');
-    Route::delete('/activitylog', [ActivityLogController::class, 'destroy'])->name('activitylogs.destroy');
+    // Use pluralized naming for consistency
+    Route::get('/activitylogs', [ActivityLogController::class, 'index'])->name('activitylogs.index');
+    // Usually, a delete route targets a specific log by ID
+    Route::delete('/activitylogs/{id}', [ActivityLogController::class, 'destroy'])->name('activitylogs.destroy');
 });
 
 // Archives route
 Route::middleware('auth')->group(function () {
-    Route::get('/upload', [ArchiveController::class, 'showForm']);
-    Route::post('/upload', [ArchiveController::class, 'uploadFile']);
     Route::get('/archives', [ArchiveController::class, 'listFiles'])->name('archives.listFiles');
-    Route::delete('/approved-files/{id}', [ArchiveController::class, 'destroy'])->name('approved-files.destroy');
+    Route::post('/archives/upload', [ArchiveController::class, 'uploadFile'])->name('archives.uploadFile');
+    Route::delete('/archives/{id}', [ArchiveController::class, 'destroy'])->name('archives.destroy');
 });
 
 // Profile routes
@@ -110,7 +111,12 @@ Route::get('/confirmation', function () {
 
 Route::post('/documents/{document}/request-revision', [DocumentController::class, 'requestRevision'])->name('documents.request-revision');
 
-Route::get('/document-types/{id}/signatories', [DocumentTypeController::class, 'getSignatories']);
+Route::resource('document-types', DocumentTypeController::class);
+
+// Route for fetching signatories of a specific document type
+Route::get('document-types/{documentTypeId}/signatories', [DocumentTypeController::class, 'getSignatories'])
+    ->name('document-types.signatories');
+
 
 // Route to fetch recent activity data
 Route::get('/recent-activity', [DocumentController::class, 'getRecentActivity'])->name('recent-activity');
