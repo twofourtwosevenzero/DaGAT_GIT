@@ -1,66 +1,129 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# DaGAT - Document and Governance Administration Tracker
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/Images/dagat_logo.png" alt="DaGAT Logo" width="200">
 </p>
 
-## About Laravel
+## Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+DaGAT (Document and Governance Administration Tracker) is a specialized document management system developed for local school councils to streamline documentation workflows and governance processes. Built with Laravel, this comprehensive platform integrates advanced document tracking, version control, and workflow automation to ensure efficient handling of critical school council documents.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Key Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Document Management**: Create, store, track, and manage various types of documents
+- **Workflow Automation**: Automated routing of documents through approval processes
+- **Role-Based Access Control**: Secure access with different permission levels
+- **Document Signing**: Digital signature capabilities for document approvals
+- **QR Code Integration**: Generate and scan QR codes for quick document retrieval
+- **Version Control**: Track document changes and maintain document history
+- **Analytics Dashboard**: Real-time insights into document status and council activities
+- **Activity Logging**: Comprehensive audit trails for all system actions
+- **Archive System**: Long-term storage and retrieval of historical documents
 
-## Learning Laravel
+## Technology Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Backend**: Laravel PHP Framework
+- **Frontend**: Blade Templates, JavaScript, Bootstrap, Tailwind CSS
+- **Database**: MySQL
+- **Authentication**: Laravel Fortify
+- **Deployment**: Compatible with Apache/Nginx servers
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Prerequisites
+- PHP 8.0+
+- Composer
+- MySQL
+- Node.js and NPM
 
-## Laravel Sponsors
+### Setup Steps
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/DaGAT.git
+   ```
 
-### Premium Partners
+2. Install PHP dependencies:
+   ```
+   composer install
+   ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+3. Install JavaScript dependencies:
+   ```
+   npm install && npm run build
+   ```
 
-## Contributing
+4. Create environment file:
+   ```
+   cp .env.example .env
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+5. Configure your database in the `.env` file:
+   ```
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=dagat
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 
-## Code of Conduct
+6. Generate application key:
+   ```
+   php artisan key:generate
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+7. Run database migrations:
+   ```
+   php artisan migrate
+   ```
 
-## Security Vulnerabilities
+8. Seed the database with initial data:
+   ```
+   php artisan db:seed
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+9. Start the development server:
+   ```
+   php artisan serve
+   ```
+
+## System Architecture
+
+DaGAT follows a modular architecture with the following components:
+
+- **User Management**: Handles user accounts, roles, and permissions
+- **Document Processing**: Manages document creation, routing, and approvals
+- **Notification System**: Alerts users about pending actions and document updates
+- **Analytics Engine**: Provides insights into document flows and bottlenecks
+- **Archive System**: Manages long-term document storage and retrieval
+
+## Security Features
+
+- Role-based access control
+- Encrypted document storage
+- Comprehensive audit logging
+- Session management
+- CSRF protection
+
+## Use Cases
+
+- **Administrative Document Management**: Streamline approval of policies, memos, and reports
+- **Meeting Management**: Track minutes, agendas, and action items
+- **Budget Oversight**: Manage financial documents and approval workflows
+- **Policy Development**: Collaborate on and approve school policies
+
+## Future Enhancements
+
+- Mobile application for on-the-go access
+- Advanced document OCR for searchable content
+- Integration with electronic signature providers
+- Enhanced analytics and reporting capabilities
+
+## About the Developer
+
+This project was developed as part of Deane's internship with the College of Information and Computing showcasing skills in full-stack web development, database design, and system architecture. Key technical accomplishments include implementing complex document workflows, role-based permission systems, and integrating QR code functionality.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the MIT License - see the LICENSE file for details.
